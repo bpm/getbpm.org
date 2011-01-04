@@ -29,16 +29,16 @@ staging:
   asset_cacher: false
 
 live: &LIVE
-  host: rubygems.org
+  host: sproutcutter.heroku.com
   local_storage: false
-  redirector: true
-  s3_bucket: production.s3.rubygems.org
-  s3_domain: production.s3.rubygems.org
-  cf_domain: production.cf.rubygems.org
-  asset_cacher: false
+  redirector: false
+  s3_bucket: codename-sproutcutter
+  s3_domain: s3.amazonaws.com/codename-sproutcutter
+  cf_domain: s3.amazonaws.com/codename-sproutcutter
+  asset_cacher: true
 
 production:
-  delivery_method: :sendmail
+  delivery_method: :smtp
   <<: *LIVE
 
 maintenance:
