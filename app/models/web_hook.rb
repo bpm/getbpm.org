@@ -62,7 +62,7 @@ class WebHook < ActiveRecord::Base
     if rubygem
       rubygem.name
     else
-      "all gems"
+      "all packages"
     end
   end
 

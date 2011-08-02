@@ -13,7 +13,7 @@ class Ownership < ActiveRecord::Base
 
   def keep_last_owner
     if rubygem.owners.count == 1
-      errors[:base] << "Can't delete last owner of a gem."
+      errors[:base] << "Can't delete last owner of a package."
       false
     else
       true

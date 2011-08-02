@@ -39,13 +39,13 @@ class Api::V1::OwnersController < Api::BaseController
 
     def find_rubygem
       unless @rubygem = Rubygem.find_by_name(params[:rubygem_id])
-        render :json => 'This gem could not be found.', :status => :not_found
+        render :json => 'This package could not be found.', :status => :not_found
       end
     end
 
     def verify_gem_ownership
       unless current_user.rubygems.find_by_name(params[:rubygem_id])
-        render :json   => 'You do not have permission to manage this gem.',
+        render :json   => 'You do not have permission to manage this package.',
                :status => :unauthorized
       end
     end

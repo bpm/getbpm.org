@@ -26,7 +26,7 @@ class RubygemsController < ApplicationController
   def update
     if @linkset.update_attributes(params[:linkset])
       redirect_to rubygem_path(@rubygem)
-      flash[:success] = "Gem links updated."
+      flash[:success] = "Package links updated."
     else
       render :edit
     end
@@ -35,7 +35,7 @@ class RubygemsController < ApplicationController
   protected
     def load_gem
       if !@rubygem.owned_by?(current_user)
-        flash[:warning] = "You do not have permission to edit this gem."
+        flash[:warning] = "You do not have permission to edit this package."
         redirect_to root_url
       end
 

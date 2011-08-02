@@ -3,7 +3,7 @@
 
 <% if @rubygem.versions.count.zero? %>
   <p>
-    This gem is not currently hosted on Gemcutter.
+    This package is not currently hosted on GetBPM.org.
   </p>
 <% else %>
   <% if @latest_version.indexed %>
@@ -40,7 +40,7 @@
     </div>
   <% else %>
     <p>
-      This gem has been yanked, but it is still available for download for other gems that may have depended on it.
+      This package has been yanked, but it is still available for download for other packages that may have depended on it.
       For more information or if you need to remove it permanently, <%=link_to "please click here.", "http://help.rubygems.org/faqs/gemcutter/removing-a-published-rubygem" %>
     </p>
   <% end %>

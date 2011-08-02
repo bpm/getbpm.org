@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
           render :file => "public/404.html", :status => :not_found, :layout => false
         end
         format.json do
-          render :text => "This rubygem could not be found.", :status => :not_found
+          render :text => "This package could not be found.", :status => :not_found
         end
       end
     end
@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
     @gem_name = params[:gem_name]
     @rubygem  = Rubygem.find_by_name(@gem_name)
     if @rubygem.nil? && @gem_name != WebHook::GLOBAL_PATTERN
-      render :text   => "This gem could not be found",
+      render :text   => "This package could not be found",
              :status => :not_found
     end
   end

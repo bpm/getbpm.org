@@ -17,7 +17,7 @@ class Pusher
     import? ||
     rubygem.pushable? ||
     rubygem.owned_by?(user) ||
-    notify("You do not have permission to push to this gem.", 403)
+    notify("You do not have permission to push to this package.", 403)
   end
 
   def import?
@@ -28,9 +28,9 @@ class Pusher
     if update
       write_gem
       after_write
-      notify("Successfully registered gem: #{version.to_title}", 200)
+      notify("Successfully registered package: #{version.to_title}", 200)
     else
-      notify("There was a problem saving your gem: #{rubygem.all_errors(version)}", 403)
+      notify("There was a problem saving your package: #{rubygem.all_errors(version)}", 403)
     end
   end
 
@@ -57,10 +57,10 @@ class Pusher
   def pull_spec
     @spec = Gem::Format.from_io(body).spec
   rescue Gem::Package::FormatError
-    notify("RubyGems.org cannot process this gem.\nPlease try rebuilding it" +
+    notify("GetBPM.org cannot process this package.\nPlease try rebuilding it" +
            " and installing it locally to make sure it's valid.", 422)
   rescue Exception => e
-    notify("RubyGems.org cannot process this gem.\nPlease try rebuilding it" +
+    notify("GemBPM.org cannot process this package.\nPlease try rebuilding it" +
            " and installing it locally to make sure it's valid.\n" +
            "Error:\n#{e.message}\n#{e.backtrace.join("\n")}", 422)
   end
@@ -72,8 +72,8 @@ class Pusher
     if @version.new_record?
       true
     else
-      notify("Repushing of gem versions is not allowed.\n" +
-             "Please use `gem yank` to remove bad gem releases.", 409)
+      notify("Repushing of package versions is not allowed.\n" +
+             "Please use `bpm yank` to remove bad releases.", 409)
     end
   end
 

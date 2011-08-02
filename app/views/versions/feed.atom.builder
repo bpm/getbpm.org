@@ -2,14 +2,14 @@ xml.instruct!
 
 xml.feed "xmlns" => "http://www.w3.org/2005/Atom" do
 
-  xml.title   "Gemcutter | Latest Gems"
+  xml.title   "GetBPM.org | Latest Packages"
   xml.link    "rel" => "self",      "href" => rubygems_url(:format => :atom)
   xml.link    "rel" => "alternate", "href" => rubygems_url
   xml.id      rubygems_url
 
   xml.updated(@versions.first.updated_at.strftime("%Y-%m-%dT%H:%M:%SZ")) if @versions.any?
 
-  xml.author  { xml.name "Gemcutter" }
+  xml.author  { xml.name "GetBPM.org" }
 
   @versions.each do |version|
     xml.entry do

@@ -1,7 +1,7 @@
-<% @title = "edit gem links" %>
+<% @title = "edit package links" %>
 <% @subtitle = "for #{@rubygem.name}" %>
 <p>
-All other fields can only be edited by pushing an updated version of your gem.
+All other fields can only be edited by pushing an updated version of your package.
 </p>
 <%= error_messages_for :linkset, :object_name => "gem" %>
 <%= form_for @rubygem.linkset, :url => rubygem_url(@rubygem), :method => :put do |form| %>

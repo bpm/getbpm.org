@@ -14,7 +14,7 @@ class Api::V1::DownloadsController < Api::BaseController
         "version_downloads" => Download.for_version(full_name)
       }
     else
-      render :text => "This rubygem could not be found.", :status => :not_found
+      render :text => "This package could not be found.", :status => :not_found
     end
   end
 
