@@ -1,7 +1,7 @@
 body {
   line-height: 1;
   font-size: .625em;
-  background: #340505 url(/images/top.png) repeat-x;
+  background: #2E562A url("/images/background.png");
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -90,16 +90,15 @@ table {
 .header h1 a {
   display: block;
   width: 280px;
-  height: 51px;
+  height: 98px;
   text-indent: -9999px;
   text-decoration: none;
-  background: url(/images/rubygems.png)
+  background: url(/images/bpm.png)
 }
 
 .main {
   padding: 2.4em;
   color: #EEE;
-  margin-top: 30px;
 }
 
 .main .title {
@@ -110,13 +109,13 @@ table {
 .main .title h2 {
   line-height: 44px;
   display: inline;
-  color: #a00;
+  color: #B9740C;
   font-size: 4em;
   width: 65%;
 }
 
 .main .title h2 a {
-  color: #a00;
+  color: #B9740C;
 }
 
 .main .title h3 {
@@ -129,9 +128,9 @@ table {
 .main h4 {
   font-weight: 900;
   font-size: 1.8em;
-  color: #5E543E;
+  color: #322F2C;
   margin-left: 36px;
-  border-bottom: 1px solid #5E543E;
+  border-bottom: 1px solid #322F2C;
   width: 90%;
 }
 
@@ -155,15 +154,14 @@ table {
 .main .fold .blurb {
   text-align: right;
   float: right;
-  font-size: 1.6em;
+  font-size: 1.5em;
   line-height: 1.5;
   margin: 0 0 1.5em 0;
   width: 60%;
 }
 
 .main p,
-.main ol,
-.main .fold .blurb {
+.main ol {
   font-size: 1.6em;
   line-height: 1.5;
 }
@@ -206,8 +204,8 @@ table {
 .main .info {
   padding-top: 20px;
   padding-bottom: 20px;
-  background: #ebe3d1;
-  border: 5px solid #cbc2ae;
+  background: #F8F5E6;
+  border: 5px solid #4F744B;
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
 }
@@ -334,17 +332,15 @@ table {
 }
 
 .main .info .border {
-  border: 1px solid #b4ac99;
   margin-left: 36px;
   margin-right: 36px;
   margin-bottom: 24px;
   text-shadow: 1px 1px 1px rgba(255,255,255,0.2);
-  background: #FFF;
   padding: 3px;
 }
 
 .main .info .border .background {
-  background: url('/images/instructions.png') repeat 0 -82px;
+  border-bottom: 2px solid #BCB29A;
 }
 
 .main .info .border .install {
@@ -355,7 +351,7 @@ table {
 }
 
 .main .info .statistics .border {
-  color: #5E543E;
+  color: #322F2C;
   width: 190px;
   margin: 24px 0 0 36px;
   padding: 8px;
@@ -433,14 +429,14 @@ table {
 }
 
 .main .info ol, .main .info ul {
-  color: #5e543e;
+  color: #2A2A29;
   margin: 1.5em 36px;
 }
 
 .main h5.api {
   font-weight: 900;
   font-size: 1.5em;
-  color: #5E543E;
+  color: #322F2C;
   margin-left: 36px;
   margin-top: 20px;
 }
@@ -526,7 +522,7 @@ table {
 
 
 .main .info p {
-  color: #5e543e;
+  color: #2A2A29;
   margin: 1.5em 36px;
 }
 
@@ -568,20 +564,12 @@ table {
   margin: 0 15px;
 }
 
-.main .info .leaderboards ol li:first-child {
-  border-top: 1px solid #B4AC99;
-}
-
 .main .info .leaderboards ol li {
-  border-right: 1px solid #B4AC99;
-  border-left: 1px solid #B4AC99;
-  background: #FDF5E4;
   padding: 4px;
-  border-bottom: 1px solid #B4AC99;
 }
 
 .main .info .leaderboards ol li a {
-  background: #ECE5D6 url('/images/leaderboard.png') repeat-x;
+  background-color: #E3DFCA;
   padding: 7px;
   font-size: 0.8em;
   font-weight: 900;
@@ -593,7 +581,7 @@ table {
 }
 
 .main .info .leaderboards ol li a:hover {
-  background: #fff;
+  background: #CAC4AD;
 }
 
 .main .info .leaderboards p {
@@ -905,7 +893,7 @@ table {
   border: none;
   text-align: center;
   font-weight: normal;
-  color: #9E8686;
+  color: #FFD283;
   font-size: 1.5em;
   margin-right: 10px;
   margin-top: -15px;
@@ -913,12 +901,12 @@ table {
 
 .footer .links #thoughtbot {
   float: right;
-  font-size: 0.9em;
+  font-size: 1em;
   margin-top: -25px;
 }
 
-.footer .links #rubycentral {
-  margin-top: -25px;
+.footer .links #strobe {
+  margin-top: -14px;
   font-size: 1em;
   float: right;
   margin-right: 25px;
@@ -926,7 +914,7 @@ table {
 }
 
 .footer .links #thoughtbot img,
-.footer .links #rubycentral img {
+.footer .links #strobe img {
   padding-top: 5px;
   display: block;
 }
@@ -939,7 +927,7 @@ table {
 
 .main .info form {
   margin: 1.5em 36px;
-  color: #5e543e;
+  color: #2A2A29;
 }
 
 label, .form_links {
@@ -963,7 +951,7 @@ label, .form_links {
 
 .form_links .rubyforge_migrate {
   font-size: 12px;
-  color: #5e543e;
+  color: #2A2A29;
   display: inline-block;
 }
 
@@ -1245,14 +1233,12 @@ input[type='submit']:hover {
   margin: 18px 0 0 0;
   height: 46px;
   padding: 0 6px 0 0;
-  background: url(/images/nav-cap.png) top right no-repeat;
   z-index: 0;
   position: relative;
 }
 
 #nav {
   height: 46px;
-  background: url(/images/nav.png) 0 0 no-repeat;
 }
 
 
@@ -1595,7 +1581,7 @@ h5#downloads {
   vertical-align: middle;
   border: 1px solid #cccccc;
   margin: 12px 36px 2px 2px;
-  color: #a00;
+  color: #B9740C;
   -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   -webkit-border-radius: 5px;
