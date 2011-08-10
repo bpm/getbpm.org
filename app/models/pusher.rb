@@ -60,7 +60,7 @@ class Pusher
     notify("GetBPM.org cannot process this package.\nPlease try rebuilding it" +
            " and installing it locally to make sure it's valid.", 422)
   rescue Exception => e
-    notify("GemBPM.org cannot process this package.\nPlease try rebuilding it" +
+    notify("GetBPM.org cannot process this package.\nPlease try rebuilding it" +
            " and installing it locally to make sure it's valid.\n" +
            "Error:\n#{e.message}\n#{e.backtrace.join("\n")}", 422)
   end

@@ -7,7 +7,7 @@ class RubygemsControllerTest < ActionController::TestCase
       sign_in_as(@user)
     end
 
-    context "On GET to show for any gem" do
+    context "On GET to show for any package" do
       setup do
         @owners = [@user, Factory(:email_confirmed_user)]
         create_gem(*@owners)
@@ -17,14 +17,14 @@ class RubygemsControllerTest < ActionController::TestCase
       should respond_with :success
       should render_template :show
       should assign_to :rubygem
-      should "renders owner gems overview links" do
+      should "renders owner packages overview links" do
         @owners.each do |owner|
           assert_have_selector "a[href='#{profile_path(owner.display_id)}']"
         end
       end
     end
 
-    context "On GET to show for another user's gem" do
+    context "On GET to show for another user's package" do
       setup do
         @rubygem = Factory(:rubygem)
         get :show, :id => @rubygem.to_param
@@ -38,7 +38,7 @@ class RubygemsControllerTest < ActionController::TestCase
       end
     end
 
-    context "On GET to show for this user's gem" do
+    context "On GET to show for this user's package" do
       setup do
         create_gem(@user)
         get :show, :id => @rubygem.to_param
@@ -52,7 +52,7 @@ class RubygemsControllerTest < ActionController::TestCase
       end
     end
 
-    context "On GET to show for a gem that the user is subscribed to" do
+    context "On GET to show for a package that the user is subscribed to" do
       setup do
         @rubygem = Factory(:rubygem)
         Factory(:version, :rubygem => @rubygem)
@@ -70,7 +70,7 @@ class RubygemsControllerTest < ActionController::TestCase
       end
     end
 
-    context "On GET to show for a gem that the user is not subscribed to" do
+    context "On GET to show for a package that the user is not subscribed to" do
       setup do
         @rubygem = Factory(:rubygem)
         Factory(:version, :rubygem => @rubygem)
@@ -87,7 +87,7 @@ class RubygemsControllerTest < ActionController::TestCase
       end
     end
 
-    context "On GET to edit for this user's gem" do
+    context "On GET to edit for this user's package" do
       setup do
         create_gem(@user)
         get :edit, :id => @rubygem.to_param
@@ -107,7 +107,7 @@ class RubygemsControllerTest < ActionController::TestCase
       end
     end
 
-    context "On GET to edit for another user's gem" do
+    context "On GET to edit for another user's package" do
       setup do
         @other_user = Factory(:email_confirmed_user)
         create_gem(@other_user)
@@ -116,10 +116,10 @@ class RubygemsControllerTest < ActionController::TestCase
       should respond_with :redirect
       should assign_to(:linkset) { @linkset }
       should redirect_to('the homepage') { root_url }
-      should set_the_flash.to("You do not have permission to edit this gem.")
+      should set_the_flash.to("You do not have permission to edit this package.")
     end
 
-    context "On PUT to update for this user's gem that is successful" do
+    context "On PUT to update for this user's package that is successful" do
       setup do
         @url = "http://github.com/qrush/gemcutter"
         create_gem(@user)
@@ -127,14 +127,14 @@ class RubygemsControllerTest < ActionController::TestCase
       end
       should respond_with :redirect
       should redirect_to('the gem') { rubygem_path(@rubygem) }
-      should set_the_flash.to("Gem links updated.")
+      should set_the_flash.to("Package links updated.")
       should assign_to(:linkset) { @linkset }
       should "update linkset" do
         assert_equal @url, Rubygem.last.linkset.code
       end
     end
 
-    context "On PUT to update for this user's gem that fails" do
+    context "On PUT to update for this user's package that fails" do
       setup do
         create_gem(@user)
         @url = "totally not a url"
@@ -267,7 +267,7 @@ class RubygemsControllerTest < ActionController::TestCase
     should render_template :show
     should assign_to :rubygem
     should assign_to(:latest_version) { @latest_version }
-    should "render info about the gem" do
+    should "render info about the package" do
       assert_contain @rubygem.name
       assert_contain @latest_version.number
       assert_contain @latest_version.built_at.to_date.to_formatted_s(:long)
@@ -275,7 +275,7 @@ class RubygemsControllerTest < ActionController::TestCase
     end
   end
 
-  context "On GET to show with a gem that has multiple versions" do
+  context "On GET to show with a package that has multiple versions" do
     setup do
       @rubygem = Factory(:rubygem)
       @older_version = Factory(:version, :number => "1.0.0", :rubygem => @rubygem, :created_at => 2.minutes.ago)
@@ -286,7 +286,7 @@ class RubygemsControllerTest < ActionController::TestCase
     should respond_with :success
     should render_template :show
     should assign_to :rubygem
-    should "render info about the gem" do
+    should "render info about the package" do
       assert_contain @rubygem.name
       assert_contain @latest_version.number
       assert_contain @latest_version.built_at.to_date.to_formatted_s(:long)
@@ -297,7 +297,7 @@ class RubygemsControllerTest < ActionController::TestCase
     end
   end
 
-  context "On GET to show for a gem with no versions" do
+  context "On GET to show for a package with no versions" do
     setup do
       @rubygem = Factory(:rubygem)
       get :show, :id => @rubygem.to_param
@@ -305,12 +305,12 @@ class RubygemsControllerTest < ActionController::TestCase
     should respond_with :success
     should render_template :show
     should assign_to :rubygem
-    should "render info about the gem" do
-      assert_contain "This gem is not currently hosted on Gemcutter."
+    should "render info about the package" do
+      assert_contain "This package is not currently hosted on GetBPM.org."
     end
   end
 
-  context "On GET to show for a gem with both runtime and development dependencies" do
+  context "On GET to show for a package with both runtime and development dependencies" do
     setup do
       @version = Factory(:version)
 
@@ -329,7 +329,7 @@ class RubygemsControllerTest < ActionController::TestCase
     end
   end
 
-  context "On GET to show for nonexistent gem" do
+  context "On GET to show for nonexistent package" do
     setup do
       get :show, :id => "blahblah"
     end
@@ -338,7 +338,7 @@ class RubygemsControllerTest < ActionController::TestCase
   end
 
   context "When not logged in" do
-    context "On GET to show for a gem" do
+    context "On GET to show for a package" do
       setup do
         @rubygem = Factory(:rubygem)
         Factory(:version, :rubygem => @rubygem)

@@ -46,7 +46,7 @@ class OwnershipTest < ActiveSupport::TestCase
       @ownership_one.destroy
       @ownership_two.destroy
       assert_equal 1, @rubygem.owners.length
-      assert_equal "Can't delete last owner of a gem.", @ownership_two.errors[:base].first
+      assert_equal "Can't delete last owner of a package.", @ownership_two.errors[:base].first
     end
   end
 

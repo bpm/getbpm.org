@@ -3,7 +3,7 @@ require 'test_helper'
 class Api::V1::WebHooksControllerTest < ActionController::TestCase
   def self.should_not_find_it
     should respond_with :not_found
-    should "say gem is not found" do
+    should "say package is not found" do
       assert_contain "could not be found"
     end
   end
@@ -41,13 +41,13 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
       @request.env["Authorization"] = @user.api_key
     end
 
-    context "with the gemcutter gem" do
+    context "with the gemcutter package" do
       setup do
         @gemcutter = Factory(:rubygem, :name => "gemcutter")
         Factory(:version, :rubygem => @gemcutter)
       end
 
-      context "On POST to fire for all gems" do
+      context "On POST to fire for all packages" do
         setup do
           stub_request(:post, @url)
           post :fire, :gem_name => WebHook::GLOBAL_PATTERN,
@@ -60,7 +60,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
       end
 
-      context "On POST to fire for all gems that fails" do
+      context "On POST to fire for all packages that fails" do
         setup do
           stub_request(:post, @url).to_return(:status => 500)
           post :fire, :gem_name => WebHook::GLOBAL_PATTERN,
@@ -80,7 +80,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         Factory(:version, :rubygem => @rubygem)
       end
 
-      context "On POST to fire for a specific gem" do
+      context "On POST to fire for a specific package" do
         setup do
           stub_request(:post, @url)
           post :fire, :gem_name => @rubygem.name,
@@ -93,7 +93,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
       end
 
-      context "On POST to fire for a specific gem that fails" do
+      context "On POST to fire for a specific package that fails" do
         setup do
           stub_request(:post, @url).to_return(:status => 500)
           post :fire, :gem_name => @rubygem.name,
@@ -178,7 +178,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
 
           should respond_with :success
           should "say webhook was removed" do
-            assert_contain "Successfully removed webhook for all gems to #{@global_hook.url}"
+            assert_contain "Successfully removed webhook for all packages to #{@global_hook.url}"
           end
           should "have actually removed the webhook" do
             assert_raise ActiveRecord::RecordNotFound do
@@ -231,7 +231,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
       end
 
-      context "On POST to create hook for a gem that's hosted" do
+      context "On POST to create hook for a package that's hosted" do
         setup do
           post :create, :gem_name => @rubygem.name, :url => @url
         end
@@ -270,22 +270,22 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
           assert_nil WebHook.last.rubygem
         end
         should "respond with message that global hook was made" do
-          assert_contain "Successfully created webhook for all gems to #{@url}"
+          assert_contain "Successfully created webhook for all packages to #{@url}"
         end
       end
     end
 
-    context "On POST to create a hook for a gem that doesn't exist here" do
+    context "On POST to create a hook for a package that doesn't exist here" do
       setup do
-        post :create, :gem_name => "a gem that doesn't exist", :url => @url
+        post :create, :gem_name => "a package that doesn't exist", :url => @url
       end
 
       should_not_find_it
     end
 
-    context "On DELETE to remove a hook for a gem that doesn't exist here" do
+    context "On DELETE to remove a hook for a package that doesn't exist here" do
       setup do
-        delete :remove, :gem_name => "a gem that doesn't exist", :url => @url
+        delete :remove, :gem_name => "a package that doesn't exist", :url => @url
       end
 
       should_not_find_it

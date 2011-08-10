@@ -76,7 +76,7 @@ class PusherTest < ActiveSupport::TestCase
       stub(@cutter).body.stub!.read { nil }
       @cutter.pull_spec
       assert_nil @cutter.spec
-      assert_match %r{RubyGems\.org cannot process this gem}, @cutter.message
+      assert_match %r{GetBPM\.org cannot process this package}, @cutter.message
       assert_equal @cutter.code, 422
     end
 
@@ -157,7 +157,7 @@ class PusherTest < ActiveSupport::TestCase
         should "be false if not owned by user and an indexed version exists" do
           Factory(:version, :rubygem => @rubygem, :number => '0.1.1')
           assert ! @cutter.authorize
-          assert_equal "You do not have permission to push to this gem.", @cutter.message
+          assert_equal "You do not have permission to push to this package.", @cutter.message
           assert_equal 403, @cutter.code
         end
 
@@ -170,7 +170,7 @@ class PusherTest < ActiveSupport::TestCase
           Factory(:version, :rubygem => @rubygem, :number => '0.1.1')
           @rubygem.ownerships.create(:user => @user, :approved => false)
           assert ! @cutter.authorize
-          assert_equal "You do not have permission to push to this gem.", @cutter.message
+          assert_equal "You do not have permission to push to this package.", @cutter.message
           assert_equal 403, @cutter.code
         end
       end

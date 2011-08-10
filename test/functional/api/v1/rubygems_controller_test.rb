@@ -102,7 +102,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
       should "register new gem" do
         assert_equal 1, Rubygem.count
         assert_equal @user, Rubygem.last.ownerships.first.user
-        assert_equal "Successfully registered gem: test (0.0.0)", @response.body
+        assert_equal "Successfully registered package: test (0.0.0)", @response.body
       end
     end
 
@@ -127,7 +127,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
         assert_equal @user, Rubygem.last.ownerships.first.user
         assert_equal 1, Rubygem.last.ownerships.count
         assert_equal 2, Rubygem.last.versions.count
-        assert_equal "Successfully registered gem: test (1.0.0)", @response.body
+        assert_equal "Successfully registered package: test (1.0.0)", @response.body
       end
     end
 
@@ -169,7 +169,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
       should respond_with :unprocessable_entity
       should "not register gem" do
         assert Rubygem.count.zero?
-        assert_match /RubyGems\.org cannot process this gem/, @response.body
+        assert_match /GetBPM\.org cannot process this package/, @response.body
       end
     end
 
@@ -188,7 +188,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
         assert_equal 1, @rubygem.ownerships.size
         assert_equal @other_user, @rubygem.ownerships.first.user
         assert_equal 1, @rubygem.versions.size
-        assert_equal "You do not have permission to push to this gem.", @response.body
+        assert_equal "You do not have permission to push to this package.", @response.body
       end
     end
 
@@ -355,7 +355,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
       end
       should "deny access" do
         assert_response 401
-        assert_match "Access Denied. Please sign up for an account at http://rubygems.org", @response.body
+        assert_match "Access Denied. Please sign up for an account at http://getbpm.org", @response.body
       end
     end
   end

@@ -20,7 +20,7 @@ Feature: Manage owners
       And a rubygem exists with a name of "OGem"
       When the "OGem" rubygem is owned by "original@owner.org"
       And I list the owners of gem "OGem" with my api key
-      Then I should see "You do not have permission to manage this gem."
+      Then I should see "You do not have permission to manage this package."
 
     Scenario: Gem owner adds another owner
       Given I am signed up and confirmed as "original@owner.org/password"
@@ -49,7 +49,7 @@ Feature: Manage owners
       And a rubygem exists with a name of "OGem"
       And the "OGem" rubygem is owned by "original@owner.org"
       When I add the owner "new@owner.org" to the rubygem "OGem" with my api key
-      Then I should see "You do not have permission to manage this gem."
+      Then I should see "You do not have permission to manage this package."
 
     Scenario: Gem owner removes an owner
       Given I am signed up and confirmed as "original@owner.org/password"
@@ -79,7 +79,7 @@ Feature: Manage owners
       And a rubygem exists with a name of "OGem"
       And the "OGem" rubygem is owned by "original@owner.org"
       When I remove the owner "original@owner.org" from the rubygem "OGem" with my api key
-      Then I should see "You do not have permission to manage this gem."
+      Then I should see "You do not have permission to manage this package."
 
     Scenario: Gem owner removes himself when he is not the last owner
       Given I am signed up and confirmed as "original@owner.org/password"

@@ -59,7 +59,7 @@ class Api::V1::DownloadsControllerTest < ActionController::TestCase
     end
 
     should "say gem could not be found" do
-      assert_equal "This rubygem could not be found.", @response.body
+      assert_equal "This package could not be found.", @response.body
     end
   end
 end

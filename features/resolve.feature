@@ -51,4 +51,4 @@ Feature: Resolver endpoint
     Then I see status code 200
     When I request dependencies with 251 gems
     Then I see status code 413
-    And I should see "Too many gems to resolve, please request less than 250 gems"
+    And I should see "Too many packages to resolve, please request less than 250 packages"
