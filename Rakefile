@@ -1,4 +1,7 @@
 require File.expand_path('../config/application', __FILE__)
+
+include Rake::DSL
+
 Gemcutter::Application.load_tasks
 
 desc "Run all tests and features"
