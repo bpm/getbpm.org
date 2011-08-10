@@ -57,13 +57,6 @@ Feature: Push Gems
       When I push the gem "badname-1.0.0.gem" with my api key
       Then I should see "Name must be a String"
 
-    Scenario: User pushes gem with bad authors
-      Given I am signed up and confirmed as "email@person.com/password"
-      And I have an api key for "email@person.com/password"
-      And I have a gem "badauthors" with version "1.0.0" and authors "[3, 'Bad']"
-      When I push the gem "badauthors-1.0.0.gem" with my api key
-      Then I should see "Authors must be an Array of Strings"
-
     Scenario: User pushes gem with bad runtime dependency
       Given I am signed up and confirmed as "email@person.com/password"
       And I have an api key for "email@person.com/password"

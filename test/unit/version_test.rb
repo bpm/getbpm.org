@@ -163,7 +163,7 @@ class VersionTest < ActiveSupport::TestCase
       assert_equal @version.summary, spec.summary
 
       date = @version.built_at
-      assert_equal Time.local(date.year, date.month, date.day), spec.date
+      assert_equal Time.utc(date.year, date.month, date.day), spec.date
     end
 
     should "join multiple authors on gemspecs" do
@@ -390,11 +390,10 @@ class VersionTest < ActiveSupport::TestCase
     end
 
     [/foo/, 1337, {:foo => "bar"}].each do |example|
-      should "be invalid with authors as an Array of #{example.class}'s" do
-        assert_raise ActiveRecord::RecordInvalid do
-          @spec.authors = [example]
-          @version.update_attributes_from_gem_specification!(@spec)
-        end
+      should "be empty with authors as an Array of #{example.class}'s" do
+        @spec.authors = [example]
+        @version.update_attributes_from_gem_specification!(@spec)
+        assert_equal "", @version.authors
       end
     end
 

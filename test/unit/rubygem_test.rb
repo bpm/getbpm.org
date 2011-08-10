@@ -132,16 +132,12 @@ class RubygemTest < ActiveSupport::TestCase
       assert_equal "Home does not appear to be a valid URL", @rubygem.all_errors
     end
 
-    should "return version errors in #all_errors" do
+    should "remove invalid versions" do
       @version = Factory.build(:version)
       @specification = gem_specification_from_gem_fixture('test-0.0.0')
       @specification.authors = ["bad", 3, "authors"]
-
-      assert_raise ActiveRecord::RecordInvalid do
-        @rubygem.update_versions!(@version, @specification)
-      end
-
-      assert_equal "Authors must be an Array of Strings", @rubygem.all_errors(@version)
+      @rubygem.update_versions!(@version, @specification)
+      assert_equal "bad, authors", @version.authors
     end
 
     should "return more than one error joined for #all_errors" do
@@ -541,23 +537,23 @@ class RubygemTest < ActiveSupport::TestCase
       @rubygem = Factory(:rubygem)
       @version = Factory(:version, :rubygem => @rubygem)
 
-      Timecop.freeze DateTime.parse("10/2/2010")
+      Timecop.freeze DateTime.parse("2010-10-2")
       1.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("10/3/2010")
+      Timecop.freeze DateTime.parse("2010-10-3")
       6.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("10/16/2010")
+      Timecop.freeze DateTime.parse("2010-10-16")
       4.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("11/1/2010")
+      Timecop.freeze DateTime.parse("2010-11-1")
       2.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("11/2/2010")
+      Timecop.freeze DateTime.parse("2010-11-2")
     end
 
     should "give counts from the past 30 days" do

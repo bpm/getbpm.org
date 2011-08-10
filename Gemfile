@@ -14,20 +14,24 @@ gem "newrelic_rpm",      "2.13.0.beta6"
 gem "paul_revere",       "0.1.5"
 gem "rack-maintenance",  "0.3.0", :require => "rack/maintenance"
 gem "redis",             "2.0.1"
-gem "rest-client",       "1.0.3", :require => "rest_client"
+gem "rest-client",       "1.6.3", :require => "rest_client"
 gem "sinatra",           "1.0"
-gem "system_timer",      "1.0"
 gem "will_paginate",     "3.0.pre2"
 gem "xml-simple",        "1.0.12"
 
 # These gems suck and do stupid things when in maintenance mode
 group :development, :test, :staging, :production do
-  gem "delayed_job",             "2.1.2"
-  gem "validates_url_format_of", "0.1.0"
+  gem "delayed_job",             "2.1.4"
 end
 
-gem "pg", "0.8.0"
-# gem "mysql", "2.8.1"
+group :production do
+  gem "pg", "0.8.0"
+end
+
+group :development do
+  gem "mysql",  "2.8.1"
+  gem "heroku", "2.4.0"
+end
 
 group :test do
   gem "cucumber-rails",     "0.3.2"
@@ -38,8 +42,7 @@ group :test do
   gem "launchy",            "0.3.7"
   gem "nokogiri",           "1.4.3.1"
   gem "rack-test",          "0.5.7", :require => "rack/test"
-  gem "redgreen",           "1.2.2"
-  gem "rr",                 "0.10.11"
+  gem "rr",                 "1.0.3"
   gem "shoulda",            "2.11.1"
   gem "timecop",            "0.3.5"
   gem "webrat",             "0.5.3"
