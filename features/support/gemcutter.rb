@@ -2,7 +2,7 @@ WebMock.disable_net_connect!
 
 Hostess.local = true
 
-TEST_DIR = File.join('/', 'tmp', 'gemcutter')
+TEST_DIR = File.expand_path('tmp/gemcutter')
 
 DatabaseCleaner.clean_with :truncation
 DatabaseCleaner.strategy = :transaction

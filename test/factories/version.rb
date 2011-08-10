@@ -6,6 +6,7 @@ Factory.define :version do |version|
   version.platform          { "ruby" }
   version.association       :rubygem
   version.indexed           true
+  version.summary           "Test Summary"
 end
 
 Factory.sequence :version_number do |n|
