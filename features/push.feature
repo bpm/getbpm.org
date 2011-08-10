@@ -53,8 +53,8 @@ Feature: Push Gems
     Scenario: User pushes gem with bad name
       Given I am signed up and confirmed as "email@person.com/password"
       And I have an api key for "email@person.com/password"
-      And I have a bad gem "['badname']" with version "1.0.0"
-      When I push the gem "badname-1.0.0.gem" with my api key
+      And I have a bad gem "123" with version "1.0.0"
+      When I push the gem "123-1.0.0.gem" with my api key
       Then I should see "Name must be a String"
 
     Scenario: User pushes gem with bad runtime dependency
