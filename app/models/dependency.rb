@@ -1,4 +1,6 @@
 class Dependency < ActiveRecord::Base
+  LIMIT = 250
+
   belongs_to :rubygem
   belongs_to :version
 
@@ -7,37 +9,17 @@ class Dependency < ActiveRecord::Base
                     :parse_gem_dependency
   after_create      :push_on_to_list
 
-  validates_presence_of  :requirements
-  validates_inclusion_of :scope, :in => %w( development runtime )
-
-  scope :development, where(:scope => 'development')
-  scope :runtime,     where(:scope => 'runtime')
+  validates :requirements, :presence => true
+  validates :scope,        :inclusion => {:in => %w(development runtime)}
 
   attr_accessor :gem_dependency
 
-  LIMIT = 250
-
-  def name
-    rubygem.name
+  def self.development
+    where(:scope => 'development')
   end
 
-  def payload
-    {
-      'name'         => name,
-      'requirements' => requirements
-    }
-  end
-
-  def as_json(options = {})
-    payload
-  end
-
-  def to_xml(options = {})
-    payload.to_xml(options.merge(:root => "dependency"))
-  end
-
-  def to_s
-    "#{name} #{requirements}"
+  def self.runtime
+    where(:scope => 'runtime')
   end
 
   def self.runtime_key(full_name)
@@ -61,11 +43,38 @@ class Dependency < ActiveRecord::Base
     end.flatten
   end
 
+  def name
+    rubygem.name
+  end
+
+  def payload
+    {
+      'name'         => name,
+      'requirements' => requirements,
+    }
+  end
+
+  def as_json(options={})
+    payload
+  end
+
+  def to_xml(options={})
+    payload.to_xml(options.merge(:root => 'dependency'))
+  end
+
+  def to_yaml(*args)
+    payload.to_yaml(*args)
+  end
+
+  def to_s
+    "#{name} #{requirements}"
+  end
+
   private
 
   def use_gem_dependency
     if gem_dependency.class != Gem::Dependency
-      errors.add :rubygem, "Please use Gem::Dependency to specify dependencies." 
+      errors.add :rubygem, "Please use Gem::Dependency to specify dependencies."
       false
     end
   end
@@ -85,6 +94,6 @@ class Dependency < ActiveRecord::Base
   end
 
   def push_on_to_list
-    $redis.lpush(Dependency.runtime_key(self.version.full_name), self.to_s)
+    $redis.lpush(Dependency.runtime_key(self.version.full_name), self.to_s) if self.scope == 'runtime'
   end
 end

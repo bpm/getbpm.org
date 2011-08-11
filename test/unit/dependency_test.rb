@@ -14,7 +14,7 @@ class DependencyTest < ActiveSupport::TestCase
       assert_valid @dependency
     end
 
-    should "return json" do
+    should "return JSON" do
       @dependency.save
       json = JSON.parse(@dependency.to_json)
 
@@ -23,7 +23,7 @@ class DependencyTest < ActiveSupport::TestCase
       assert_equal @dependency.requirements, json["requirements"]
     end
 
-    should "return xml" do
+    should "return XML" do
       @dependency.save
       xml = Nokogiri.parse(@dependency.to_xml)
 
@@ -33,10 +33,25 @@ class DependencyTest < ActiveSupport::TestCase
       assert_equal @dependency.requirements, xml.at_css("requirements").content
     end
 
+    should "return YAML" do
+      @dependency.save
+      yaml = YAML.load(@dependency.to_yaml)
+
+      assert_equal %w[name requirements], yaml.keys
+      assert_equal @dependency.rubygem.name, yaml["name"]
+      assert_equal @dependency.requirements, yaml["requirements"]
+    end
+
     should "be pushed onto a redis list if a runtime dependency" do
       @dependency.save
 
       assert_equal "#{@dependency.name} #{@dependency.requirements}", $redis.lindex(Dependency.runtime_key(@version.full_name), 0)
+    end
+
+    should "not push development dependency onto the redis list" do
+      @dependency = Factory(:development_dependency)
+
+      assert !$redis.exists(Dependency.runtime_key(@dependency.version.full_name))
     end
   end
 
@@ -51,21 +66,21 @@ class DependencyTest < ActiveSupport::TestCase
 
       should "create a Dependency referring to the existing Rubygem" do
         assert_equal @rubygem,      @dependency.rubygem
-        assert_equal @requirements[0], @dependency.requirements
+        assert_equal @requirements[0].to_s, @dependency.requirements
       end
     end
 
     context "that refers to a Rubygem that exists and has multiple requirements" do
       setup do
         @rubygem        = Factory(:rubygem)
-        @requirements   = ['>= 0.0.0', '< 1.0.0']
+        @requirements   = ['< 1.0.0', '>= 0.0.0']
         @gem_dependency = Gem::Dependency.new(@rubygem.name, @requirements)
         @dependency     = Factory(:dependency, :rubygem => @rubygem, :gem_dependency => @gem_dependency)
       end
 
       should "create a Dependency referring to the existing Rubygem" do
-        assert_equal @rubygem,            @dependency.rubygem
-        assert_equal @requirements.sort.join(', '), @dependency.requirements
+        assert_equal @rubygem, @dependency.rubygem
+        assert_equal @requirements.join(', '), @dependency.requirements
       end
     end
 

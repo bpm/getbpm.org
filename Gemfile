@@ -1,50 +1,65 @@
-source :rubygems
-gem "rails", "3.0.3"
-gem "rack",  "1.2.1"
-gem "mail",  "2.2.15"
+source 'http://rubygems.org'
 
-gem "clearance",         "0.9.1"
-gem "fog",               "0.3.25"
-gem "gchartrb",          "0.8",   :require => "google_chart"
-gem "gravtastic",        "2.1.3"
-gem "high_voltage",      "0.9.1"
-gem "hoptoad_notifier",  "2.2.0"
-gem "json",              "1.2.0"
-gem "newrelic_rpm",      "2.14.1"
-gem "paul_revere",       "0.1.5"
-gem "rack-maintenance",  "0.3.0", :require => "rack/maintenance"
-gem "redis",             "2.0.1"
-gem "rest-client",       "1.6.3", :require => "rest_client"
-gem "sinatra",           "1.0"
-gem "will_paginate",     "3.0.0"
-gem "xml-simple",        "1.0.12"
+gem 'rails', '~> 3.0.9'
 
-# These gems suck and do stupid things when in maintenance mode
-group :development, :test, :staging, :production do
-  gem "delayed_job",             "2.1.4"
+gem 'clearance', '~> 0.9.1'
+gem 'fog'
+gem 'gchartrb', :require => 'google_chart'
+gem 'gravtastic'
+gem 'high_voltage'
+gem 'hoptoad_notifier'
+gem 'mail'
+gem 'newrelic_rpm'
+gem 'paul_revere'
+gem 'pg'
+gem 'rack'
+gem 'rack-maintenance', :require => 'rack/maintenance'
+gem 'rdoc'
+gem 'redis'
+gem 'rest-client', :require => 'rest_client'
+gem 'sinatra'
+gem 'will_paginate'
+gem 'xml-simple'
+gem 'yajl-ruby', :require => 'yajl/json_gem'
+
+platforms :ruby_19 do
+  gem 'psych'
 end
 
-group :production do
-  gem "pg", "0.8.0"
+platforms :ruby_18 do
+  gem 'system_timer'
+  group :test do
+    gem 'redgreen'
+  end
+end
+
+platforms :jruby do
+  gem 'jruby-openssl'
 end
 
 group :development do
-  gem "mysql",  "2.8.1"
-  gem "heroku", "2.4.0"
+  gem 'rails-erd'
+end
+
+# These gems suck and do stupid things when in maintenance mode
+group :development, :test, :staging, :production do
+  gem 'delayed_job'
+  gem 'validates_url_format_of', '~> 0.1.2'
+end
+
+group :development, :test do
+  gem 'silent-postgres'
 end
 
 group :test do
-  gem "cucumber-rails",     "0.3.2"
-  gem "factory_girl_rails", "1.0"
-
-  gem "database_cleaner",   "0.5.2"
-  gem "fakeweb",            "1.2.6"
-  gem "launchy",            "0.3.7"
-  gem "nokogiri",           "1.4.3.1"
-  gem "rack-test",          "0.5.7", :require => "rack/test"
-  gem "rr",                 "1.0.3"
-  gem "shoulda",            "2.11.1"
-  gem "timecop",            "0.3.5"
-  gem "webrat",             "0.5.3"
-  gem "webmock",            "0.7.3"
+  gem 'cucumber-rails'
+  gem 'database_cleaner'
+  gem 'factory_girl_rails'
+  gem 'launchy'
+  gem 'nokogiri'
+  gem 'rack-test', :require => 'rack/test'
+  gem 'rr'
+  gem 'shoulda'
+  gem 'timecop'
+  gem 'webmock'
 end

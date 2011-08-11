@@ -1,4 +1,9 @@
 class Rubygem < ActiveRecord::Base
+  SPECIAL_CHARACTERS = ".-_"
+  ALLOWED_CHARACTERS = "[A-Za-z0-9#{Regexp.escape(SPECIAL_CHARACTERS)}]+"
+  ROUTE_PATTERN      = /#{ALLOWED_CHARACTERS}/
+  LAZY_ROUTE_PATTERN = /#{ALLOWED_CHARACTERS}?/
+  NAME_PATTERN       = /\A#{ALLOWED_CHARACTERS}\Z/
 
   has_many :owners, :through => :ownerships, :source => :user
   has_many :ownerships, :dependent => :destroy
@@ -9,47 +14,38 @@ class Rubygem < ActiveRecord::Base
   has_one :linkset, :dependent => :destroy
 
   validate :ensure_name_format
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  validates :name, :presence => true, :uniqueness => true
 
-  scope :with_versions,
+  def self.with_versions
     where("rubygems.id IN (SELECT rubygem_id FROM versions where versions.indexed IS true)")
-
-  scope :with_one_version,
-    select('rubygems.*').
-    joins(:versions).
-    group(column_names.map{ |name| "rubygems.#{name}" }.join(', ')).
-    having('COUNT(versions.id) = 1')
-
-  scope :name_is, lambda { |name| 
-    where(:name => name.strip).
-    limit(1)
-  }
-
-  scope :search, lambda { |query| 
-    where(["versions.indexed and (upper(name) like upper(:query) or upper(versions.description) like upper(:query))", {:query => "%#{query.strip}%"}]).
-    includes(:versions).
-    order("rubygems.downloads desc")
-  }
-
-  scope :name_starts_with, lambda { |letter| 
-    where(["upper(name) like upper(?)", "#{letter}%" ])
-  }
-
-  def ensure_name_format
-    if name.class != String
-      errors.add :name, "must be a String"
-    elsif name =~ /^[\d]+$/
-      errors.add :name, "must include at least one letter"
-    elsif name =~ /[^\d\w\-\.]/
-      errors.add :name, "can only include letters, numbers, dashes, and underscores"
-    end
   end
 
-  def all_errors(version = nil)
-    [self, linkset, version].compact.map do |ar|
-      ar.errors.full_messages
-    end.flatten.join(", ")
+  def self.with_one_version
+    select('rubygems.*').
+    joins(:versions).
+    group(column_names.map { |name| "rubygems.#{name}" }.join(', ')).
+    having('COUNT(versions.id) = 1')
+  end
+
+  def self.name_is(name)
+    where(:name => name.strip).limit(1)
+  end
+
+  def self.search(query)
+    conditions = <<-SQL
+      versions.indexed and
+        (upper(name) like upper(:query) or
+         upper(translate(name, '#{SPECIAL_CHARACTERS}', '#{' ' * SPECIAL_CHARACTERS.length}')) like upper(:query) or
+         upper(versions.description) like upper(:query))
+    SQL
+
+    where(conditions, {:query => "%#{query.strip}%"}).
+      includes(:versions).
+      by_downloads
+  end
+
+  def self.name_starts_with(letter)
+    where("upper(name) like upper(?)", "#{letter}%")
   end
 
   def self.total_count
@@ -61,7 +57,7 @@ class Rubygem < ActiveRecord::Base
   end
 
   def self.downloaded(limit=5)
-    with_versions.order("downloads desc").limit(limit)
+    with_versions.by_downloads.limit(limit)
   end
 
   def self.letter(letter)
@@ -72,8 +68,30 @@ class Rubygem < ActiveRecord::Base
     letter =~ /\A[A-Za-z]\z/ ? letter.upcase : 'A'
   end
 
-  def public_versions
-    versions.published.by_position
+  def self.monthly_dates
+    (2..31).map { |n| n.days.ago.to_date }.reverse
+  end
+
+  def self.monthly_short_dates
+    monthly_dates.map { |date| date.strftime("%m/%d") }
+  end
+
+  def self.versions_key(name)
+    "r:#{name}"
+  end
+
+  def self.by_downloads
+    order("rubygems.downloads desc")
+  end
+
+  def all_errors(version = nil)
+    [self, linkset, version].compact.map do |ar|
+      ar.errors.full_messages
+    end.flatten.join(", ")
+  end
+
+  def public_versions(limit = nil)
+    versions.published(limit).by_position
   end
 
   def hosted?
@@ -100,7 +118,7 @@ class Rubygem < ActiveRecord::Base
     versions.to_a.sum {|v| Download.today(v) }
   end
 
-  def payload(version = versions.most_recent, host_with_port = HOST)
+  def payload(version=versions.most_recent, host_with_port=HOST)
     {
       'name'              => name,
       'downloads'         => downloads,
@@ -123,12 +141,12 @@ class Rubygem < ActiveRecord::Base
     }
   end
 
-  def as_json(options = {})
+  def as_json(options={})
     payload
   end
 
-  def to_xml(options = {})
-    payload.to_xml(options.merge(:root => "rubygem"))
+  def to_xml(options={})
+    payload.to_xml(options.merge(:root => 'rubygem'))
   end
 
   def to_param
@@ -187,10 +205,10 @@ class Rubygem < ActiveRecord::Base
 
     self.versions.update_all(:latest => false)
 
-    self.versions.release.with_indexed.inject(Hash.new { |h, k| h[k] = [] }) { |platforms, version|
+    self.versions.release.indexed.inject(Hash.new{|h, k| h[k] = []}) do |platforms, version|
       platforms[version.platform] << version
       platforms
-    }.each_value do |platforms|
+    end.each_value do |platforms|
       Version.update_all({:latest => true}, {:id => platforms.sort.last.id})
     end
   end
@@ -213,15 +231,19 @@ class Rubygem < ActiveRecord::Base
     $redis.hmget(Download.history_key(self), *key_dates).map(&:to_i)
   end
 
-  def self.monthly_dates
-    (2..31).map { |n| n.days.ago.to_date }.reverse
+  def first_built_date
+    versions.by_built_at.limit(1).last.built_at
   end
 
-  def self.monthly_short_dates
-    monthly_dates.map { |date| date.strftime("%m/%d") }
-  end
+  private
 
-  def self.versions_key(name)
-    "r:#{name}"
+  def ensure_name_format
+    if name.class != String
+      errors.add :name, "must be a String"
+    elsif name =~ /\A[\d]+\Z/
+      errors.add :name, "must include at least one letter"
+    elsif name !~ NAME_PATTERN
+      errors.add :name, "can only include letters, numbers, dashes, and underscores"
+    end
   end
 end

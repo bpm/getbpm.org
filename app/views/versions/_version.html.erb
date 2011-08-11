@@ -1,10 +1,10 @@
 <li>
   <%= link_to version.number, rubygem_version_url(version.rubygem, version.slug) %>
-  <small><%= version.built_at_date %></small>
+  <small><%= nice_date_for(version.built_at) %></small>
   <% if version.platformed? %>
     <span class="platform"><%= version.platform %></span>
   <% end %>
   <% if version.yanked? -%>
-    <span class="yanked">yanked</span>
+    <span class="yanked"><%= t '.yanked' %></span>
   <% end -%>
 </li>

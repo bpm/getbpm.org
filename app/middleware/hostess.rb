@@ -57,7 +57,7 @@ class Hostess < Sinatra::Base
      /quick/latest_index
   ].each do |old_index|
     head old_index do
-      "Please upgrade your RubyGems, it's quite old: http://rubygems.org/pages/download"
+      "Please upgrade your RubyGems, it's quite old: http://getbpm.org/pages/download"
     end
 
     get old_index do
@@ -89,10 +89,10 @@ class Hostess < Sinatra::Base
   end
 
   get "/downloads/*.gem" do
-    redirect "/gems/#{params[:splat].first}.gem"
+    redirect "/gems/#{params[:splat].join}.gem"
   end
 
   def full_name
-    @full_name ||= params[:splat].first.chomp('.gem')
+    @full_name ||= params[:splat].join.chomp('.gem')
   end
 end

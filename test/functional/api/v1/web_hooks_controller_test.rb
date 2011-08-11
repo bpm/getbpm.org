@@ -1,10 +1,11 @@
 require 'test_helper'
+require 'yaml'
 
 class Api::V1::WebHooksControllerTest < ActionController::TestCase
   def self.should_not_find_it
     should respond_with :not_found
-    should "say package is not found" do
-      assert_contain "could not be found"
+    should "say gem is not found" do
+      assert page.has_content?("could not be found")
     end
   end
 
@@ -55,7 +56,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
         should respond_with :success
         should "say successfully deployed" do
-          assert_contain "Successfully deployed webhook for #{@gemcutter.name} to #{@url}"
+          assert page.has_content?("Successfully deployed webhook for #{@gemcutter.name} to #{@url}")
           assert WebHook.count.zero?
         end
       end
@@ -68,7 +69,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
         should respond_with :bad_request
         should "say successfully deployed" do
-          assert_contain "There was a problem deploying webhook for #{@gemcutter.name} to #{@url}"
+          assert page.has_content?("There was a problem deploying webhook for #{@gemcutter.name} to #{@url}")
           assert WebHook.count.zero?
         end
       end
@@ -88,7 +89,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
         should respond_with :success
         should "say successfully deployed" do
-          assert_contain "Successfully deployed webhook for #{@rubygem.name} to #{@url}"
+          assert page.has_content?("Successfully deployed webhook for #{@rubygem.name} to #{@url}")
           assert WebHook.count.zero?
         end
       end
@@ -101,7 +102,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         end
         should respond_with :bad_request
         should "say there was a problem" do
-          assert_contain "There was a problem deploying webhook for #{@rubygem.name} to #{@url}"
+          assert page.has_content?("There was a problem deploying webhook for #{@rubygem.name} to #{@url}")
           assert WebHook.count.zero?
         end
       end
@@ -115,39 +116,39 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
                                   :user    => @user)
         end
 
-        context "On GET to index with json" do
+        context "On GET to index with JSON" do
           setup do
             get :index, :format => "json"
           end
           should respond_with :success
-          should "be able to parse some json" do
+          should "be able to parse some JSON" do
             assert_nothing_raised do
               JSON.parse(@response.body)
             end
           end
         end
 
-        context "On GET to index with yaml" do
+        context "On GET to index with XML" do
+          setup do
+            get :index, :format => "xml"
+          end
+          should respond_with :success
+          should "be able to parse some XML" do
+            assert_nothing_raised do
+              Nokogiri.parse(@response.body)
+            end
+          end
+        end
+
+        context "On GET to index with YAML" do
           setup do
             get :index, :format => "yaml"
           end
           should respond_with :success
-          should "be able to parse some yaml" do
+          should "be able to parse some YAML" do
             payload = YAML.load(@response.body)
             assert_equal @global_hook.payload, payload["all gems"].first
             assert_equal @rubygem_hook.payload, payload[@rubygem.name].first
-          end
-        end
-
-        context "On GET to index with no format" do
-          setup do
-            get :index
-          end
-          should respond_with :success
-          should "be able to parse some json" do
-            assert_nothing_raised do
-              JSON.parse(@response.body)
-            end
           end
         end
 
@@ -160,7 +161,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
 
           should respond_with :success
           should "say webhook was removed" do
-            assert_contain "Successfully removed webhook for #{@rubygem.name} to #{@rubygem_hook.url}"
+            assert page.has_content?("Successfully removed webhook for #{@rubygem.name} to #{@rubygem_hook.url}")
           end
           should "have actually removed the webhook" do
             assert_raise ActiveRecord::RecordNotFound do
@@ -178,7 +179,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
 
           should respond_with :success
           should "say webhook was removed" do
-            assert_contain "Successfully removed webhook for all packages to #{@global_hook.url}"
+            assert page.has_content?("Successfully removed webhook for all packages to #{@global_hook.url}")
           end
           should "have actually removed the webhook" do
             assert_raise ActiveRecord::RecordNotFound do
@@ -207,7 +208,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
 
           should respond_with :not_found
           should "say webhook was not found" do
-            assert_contain "No such webhook exists under your account."
+            assert page.has_content?("No such webhook exists under your account.")
           end
           should "not delete the webhook" do
             assert_not_nil WebHook.find(@rubygem_hook.id)
@@ -223,7 +224,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
 
           should respond_with :not_found
           should "say webhook was not found" do
-            assert_contain "No such webhook exists under your account."
+            assert page.has_content?("No such webhook exists under your account.")
           end
           should "not delete the webhook" do
             assert_not_nil WebHook.find(@rubygem_hook.id)
@@ -238,7 +239,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
 
         should respond_with :created
         should "say webhook was created" do
-          assert_contain "Successfully created webhook for #{@rubygem.name} to #{@url}"
+          assert page.has_content?("Successfully created webhook for #{@rubygem.name} to #{@url}")
         end
         should "link webhook to current user and rubygem" do
           assert_equal @user, WebHook.last.user
@@ -255,7 +256,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
         should respond_with :conflict
         should "be only 1 web hook" do
           assert_equal 1, WebHook.count
-          assert_contain "#{@url} has already been registered for #{@rubygem.name}"
+          assert page.has_content?("#{@url} has already been registered for #{@rubygem.name}")
         end
       end
 
@@ -270,7 +271,7 @@ class Api::V1::WebHooksControllerTest < ActionController::TestCase
           assert_nil WebHook.last.rubygem
         end
         should "respond with message that global hook was made" do
-          assert_contain "Successfully created webhook for all packages to #{@url}"
+          assert page.has_content?("Successfully created webhook for all packages to #{@url}")
         end
       end
     end

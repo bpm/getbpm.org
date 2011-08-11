@@ -9,7 +9,7 @@ module RubygemsHelper
 
   def simple_markup(text)
     if text =~ /^==+ [A-Z]/
-      RDoc::Markup::ToHtml.new.convert(text, SM::ToHtml.new).html_safe
+      RDoc::Markup.new.convert(text, RDoc::Markup::ToHtml.new).html_safe
     else
       content_tag :p, text
     end
@@ -62,7 +62,12 @@ module RubygemsHelper
 
   def links_to_owners(rubygem)
     rubygem.owners.sort_by(&:id).map do |owner|
-      link_to gravatar(48, "gravatar-#{owner.id}", owner), profile_path(owner.display_id), :alt => owner.display_handle
+      link_to gravatar(48, "gravatar-#{owner.id}", owner), profile_path(owner.display_id),
+        :alt => owner.display_handle, :title => owner.display_handle
     end.join.html_safe
+  end
+
+  def nice_date_for(time)
+    time.to_date.to_formatted_s(:long)
   end
 end

@@ -1,4 +1,4 @@
-And "the following dependencies exist:" do |table|
+And /the following gem dependencies exist:/ do |table|
   table.hashes.each do |hash|
     version        = Version.find_by_full_name!(hash['Version'])
     rubygem        = Factory(:rubygem, :name => hash['Rubygem'])
@@ -14,5 +14,5 @@ When /^I request dependencies with (\d+) gems$/ do |count|
 end
 
 Then /^I see status code (\d+)$/ do |code|
-  assert_equal code, response.code
+  assert_equal code.to_i, page.status_code
 end

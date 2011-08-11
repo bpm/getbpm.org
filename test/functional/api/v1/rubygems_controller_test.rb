@@ -1,7 +1,7 @@
-require File.join(File.dirname(__FILE__), '..', '..', '..', 'test_helper')
+require 'test_helper'
+require 'yaml'
 
 class Api::V1::RubygemsControllerTest < ActionController::TestCase
-  #should_forbid { post :create }
   should "route old paths to new controller" do
     get_route = {:controller => 'api/v1/rubygems', :action => 'show', :id => "rails", :format => "json"}
     assert_recognizes(get_route, '/api/v1/gems/rails.json')
@@ -16,21 +16,39 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
       sign_in_as(@user)
     end
 
-    context "On GET to show with json for a gem that's hosted" do
+    context "On GET to show with JSON for a gem that's hosted" do
       setup do
-        @rubygem = Factory(:rubygem)
+        @rubygem = Factory(:rubygem, :name => "foo")
         Factory(:version, :rubygem => @rubygem)
         get :show, :id => @rubygem.to_param, :format => "json"
       end
 
       should assign_to(:rubygem) { @rubygem }
       should respond_with :success
-      should "return a json hash" do
-        assert_not_nil JSON.parse(@response.body)
+      should "return a JSON hash" do
+        response = JSON.parse(@response.body)
+        assert_not_nil response
+        assert_kind_of Hash, response
       end
     end
 
-    context "On GET to show with xml for a gem that's hosted" do
+    context "On GET to show with JSON for a gem that's hosted with a period in its name" do
+      setup do
+        @rubygem = Factory(:rubygem, :name => "foo.rb")
+        Factory(:version, :rubygem => @rubygem)
+        get :show, :id => @rubygem.to_param, :format => "json"
+      end
+
+      should assign_to(:rubygem) { @rubygem }
+      should respond_with :success
+      should "return a JSON hash" do
+        response = JSON.parse(@response.body)
+        assert_not_nil response
+        assert_kind_of Hash, response
+      end
+    end
+
+    context "On GET to show with XML for a gem that's hosted" do
       setup do
         @rubygem = Factory(:rubygem)
         Factory(:version, :rubygem => @rubygem)
@@ -39,8 +57,58 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
 
       should assign_to(:rubygem) { @rubygem }
       should respond_with :success
-      should "return a json hash" do
-        assert_not_nil Nokogiri.parse(@response.body).root
+      should "return an XML document" do
+        response = Nokogiri.parse(@response.body).root
+        assert_not_nil response
+        assert_kind_of Nokogiri::XML::Element, response
+      end
+    end
+
+    context "On GET to show with XML for a gem that's hosted with a period in its name" do
+      setup do
+        @rubygem = Factory(:rubygem, :name => "foo.rb")
+        Factory(:version, :rubygem => @rubygem)
+        get :show, :id => @rubygem.to_param, :format => "xml"
+      end
+
+      should assign_to(:rubygem) { @rubygem }
+      should respond_with :success
+      should "return an XML document" do
+        response = Nokogiri.parse(@response.body).root
+        assert_not_nil response
+        assert_kind_of Nokogiri::XML::Element, response
+      end
+    end
+
+    context "On GET to show with YAML for a gem that's hosted" do
+      setup do
+        @rubygem = Factory(:rubygem)
+        Factory(:version, :rubygem => @rubygem)
+        get :show, :id => @rubygem.to_param, :format => "yaml"
+      end
+
+      should assign_to(:rubygem) { @rubygem }
+      should respond_with :success
+      should "return a YAML hash" do
+        response = YAML.load(@response.body)
+        assert_not_nil response
+        assert_kind_of Hash, response
+      end
+    end
+
+    context "On GET to show with YAML for a gem that's hosted with a period in its name" do
+      setup do
+        @rubygem = Factory(:rubygem, :name => "foo.rb")
+        Factory(:version, :rubygem => @rubygem)
+        get :show, :id => @rubygem.to_param, :format => "yaml"
+      end
+
+      should assign_to(:rubygem) { @rubygem }
+      should respond_with :success
+      should "return an YAML hash" do
+        response = YAML.load(@response.body)
+        assert_not_nil response
+        assert_kind_of Hash, response
       end
     end
 
@@ -53,7 +121,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
 
       should assign_to(:rubygem) { @rubygem }
       should respond_with :success
-      should "return a json hash" do
+      should "return a JSON hash" do
         assert_not_nil JSON.parse(@response.body)
       end
     end
@@ -109,14 +177,14 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
     context "On POST to create for existing gem" do
       setup do
         rubygem = Factory(:rubygem,
-                            :name       => "test")
+                          :name       => "test")
         Factory(:ownership, :rubygem    => rubygem,
-                            :user       => @user,
-                            :approved   => true)
+                :user       => @user,
+                :approved   => true)
         Factory(:version,   :rubygem    => rubygem,
-                            :number     => "0.0.0",
-                            :updated_at => 1.year.ago,
-                            :created_at => 1.year.ago)
+                :number     => "0.0.0",
+                :updated_at => 1.year.ago,
+                :created_at => 1.year.ago)
 
         @request.env["RAW_POST_DATA"] = gem_file("test-1.0.0.gem").read
         post :create
@@ -136,8 +204,8 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
         rubygem = Factory(:rubygem,
                           :name       => "test")
         Factory(:ownership, :rubygem    => rubygem,
-                            :user       => @user,
-                            :approved   => true)
+                :user       => @user,
+                :approved   => true)
 
         @date = 1.year.ago
         @version = Factory(:version,
@@ -210,7 +278,6 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
           assert @rubygem.ownerships.count.zero?
         end
       end
-      
 
       context "and a version 0.1.1" do
         setup do
@@ -229,7 +296,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
           end
         end
       end
-      
+
       context "and a version 0.1.1 and platform x86-darwin-10" do
         setup do
           @v2 = Factory(:version, :rubygem => @rubygem, :number => "0.1.1", :platform => "x86-darwin-10")
@@ -244,6 +311,9 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
             assert_equal 2, @rubygem.versions.count
             assert_equal 1, @rubygem.versions.indexed.count
             assert_equal 1, @rubygem.ownerships.count
+          end
+          should "show platform in response" do
+            assert_equal "Successfully yanked package: SomeGem (0.1.1-x86-darwin-10)", @response.body
           end
         end
       end
@@ -266,7 +336,6 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
           delete :yank, :gem_name => @rubygem.to_param, :version => '0.1.0'
         end
         should respond_with :forbidden
-        #should not_change("the rubygem's indexed version count") { @rubygem.versions.indexed.count }
       end
 
       context "ON DELETE to yank for an already yanked gem" do
@@ -276,7 +345,6 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
         end
         should respond_with :unprocessable_entity
       end
-
     end
 
     context "for a gem SomeGem with a yanked version 0.1.0 and unyanked version 0.1.1" do
@@ -298,7 +366,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
           assert @v1.reload.indexed?
         end
       end
-      
+
       context "ON PUT to unyank for version 0.1.2 and platform x86-darwin-10" do
         setup do
           put :unyank, :gem_name => @rubygem.to_param, :version => @v3.number, :platform => @v3.platform
@@ -309,18 +377,17 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
           assert @v3.reload.indexed?
         end
       end
-      
+
 
       context "ON PUT to unyank for version 0.1.1" do
         setup do
           put :unyank, :gem_name => @rubygem.to_param, :version => @v2.number
         end
         should respond_with :unprocessable_entity
-        #should not_change("the rubygem's indexed version count") { @rubygem.versions.indexed.count }
       end
     end
 
-    context "On GET to index with json for a list of owned gems" do
+    context "On GET to index with JSON for a list of owned gems" do
       setup do
         @mygems = [ Factory(:rubygem, :name => "SomeGem"), Factory(:rubygem, :name => "AnotherGem") ]
         @mygems.each do |rubygem|
@@ -338,7 +405,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
 
       should assign_to(:rubygems) { [@rubygem] }
       should respond_with :success
-      should "return a json hash" do
+      should "return a JSON hash" do
         assert_not_nil JSON.parse(@response.body)
       end
       should "only return my gems" do
@@ -349,7 +416,7 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
   end
 
   context "No signed in-user" do
-    context "On GET to index with json for a list of gems" do
+    context "On GET to index with JSON for a list of gems" do
       setup do
         get :index, :format => "json"
       end
@@ -359,6 +426,4 @@ class Api::V1::RubygemsControllerTest < ActionController::TestCase
       end
     end
   end
-
-  
 end

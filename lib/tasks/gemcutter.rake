@@ -10,29 +10,6 @@ namespace :gemcutter do
     end
   end
 
-  desc "Store legacy index"
-  task :store_legacy_index => :environment do
-    puts "Loading up versions..."
-    versions = Version.with_deps.with_indexed
-
-    puts "Mapping specs..."
-    index = versions.map do |version|
-      [version.full_name, version.to_spec]
-    end
-
-    puts "Uploading to S3..."
-    class Uploader
-      include Vault
-    end
-    file = Uploader.new.directory.files.create(
-      :body   => Gem.deflate(Marshal.dump(index)),
-      :key    => "Marshal.4.8.Z",
-      :public => true
-    )
-
-    puts "Ding, legacy index is done!"
-  end
-
   desc "fix full names"
   task :fix_full_names => :environment do
     Version.without_any_callbacks do
@@ -52,6 +29,18 @@ namespace :gemcutter do
         b.report(" specs index") { g.upload("specs.4.8.gz", g.specs_index) }
         b.report("latest index") { g.upload("latest_specs.4.8.gz", g.latest_index) }
         b.report("   pre index") { g.upload("prerelease_specs.4.8.gz", g.prerelease_index) }
+      end
+    end
+
+    desc "benchmark index creation"
+    task :benchmark => :environment do
+      require 'benchmark'
+      puts "Total versions: #{Version.count}"
+      Benchmark.bm do|b|
+        g = Pusher.new(nil, StringIO.new)
+        b.report(" specs index") { g.stringify(g.specs_index) }
+        b.report("latest index") { g.stringify(g.latest_index) }
+        b.report("   pre index") { g.stringify(g.prerelease_index) }
       end
     end
 
@@ -177,6 +166,38 @@ namespace :gemcutter do
       end
 
       Pusher.indexer.update_index(source_index)
+    end
+  end
+
+  namespace :rubygems do
+    desc "update rubygems. run as: rake gemcutter:rubygems:update VERSION=[version number] RAILS_ENV=[staging|production] S3_KEY=[key] S3_SECRET=[secret]"
+    task :update => :environment do
+      version     = ENV["VERSION"]
+      app_path    = Rails.root.join("config", "application.rb")
+      old_content = app_path.read
+      new_content = old_content.gsub(/RUBYGEMS_VERSION = "(.*)"/, %{RUBYGEMS_VERSION = "#{version}"})
+
+      app_path.open("w") do |file|
+        file.write new_content
+      end
+
+      class Updater
+        include Vault
+      end
+
+      updater = Updater.new
+      html    = Nokogiri.parse(open("http://rubyforge.org/frs/?group_id=126"))
+      links   = html.css("a[href*='#{version}']").map { |n| n["href"] }
+      links.each do |link|
+        url = "http://rubyforge.org#{link}"
+
+        puts "Uploading #{url}..."
+        updater.directory.files.create({
+          :body   => open(url).read,
+          :key    => "rubygems/#{File.basename(url)}",
+          :public => true
+        })
+      end
     end
   end
 end

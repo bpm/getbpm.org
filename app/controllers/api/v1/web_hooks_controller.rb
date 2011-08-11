@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Api::V1::WebHooksController < Api::BaseController
   skip_before_filter :verify_authenticity_token
 
@@ -7,8 +9,9 @@ class Api::V1::WebHooksController < Api::BaseController
 
   def index
     respond_to do |format|
-      format.any(:json, :all) { render :json => current_user.all_hooks }
-      format.yaml { render :text => Hash[current_user.all_hooks].to_yaml }
+      format.json { render :json => current_user.all_hooks }
+      format.xml  { render :xml => current_user.all_hooks }
+      format.yaml { render :text => current_user.all_hooks.to_yaml }
     end
   end
 

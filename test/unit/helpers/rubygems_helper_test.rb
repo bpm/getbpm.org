@@ -11,6 +11,12 @@ class RubygemsHelperTest < ActionView::TestCase
     end
   end
 
+  should "show a nice formatted date" do
+    Timecop.travel(Date.parse("2011-03-18")) do
+      assert_equal "March 18, 2011", nice_date_for(DateTime.now)
+    end
+  end
+
   should "link to docs if no docs link is set" do
     version = Factory.build(:version)
     linkset = Factory.build(:linkset, :docs => nil)
@@ -81,7 +87,10 @@ class RubygemsHelperTest < ActionView::TestCase
     should "create links to owners gem overviews" do
       users = Array.new(2) { Factory(:email_confirmed_user) }
       create_gem(*users)
-      expected_links = users.sort_by(&:id).map { |u| link_to gravatar(48, "gravatar-#{u.id}", u), profile_path(u.display_id), :alt => u.display_handle }.join
+      expected_links = users.sort_by(&:id).map { |u|
+        link_to gravatar(48, "gravatar-#{u.id}", u), profile_path(u.display_id), :alt => u.display_handle,
+          :title => u.display_handle
+      }.join
       assert_equal expected_links, links_to_owners(@rubygem)
       assert links_to_owners(@rubygem).html_safe?
     end

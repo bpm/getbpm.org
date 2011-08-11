@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Api::V1::RubygemsController < Api::BaseController
   skip_before_filter :verify_authenticity_token, :only => [:create, :yank, :unyank]
 
@@ -9,20 +11,26 @@ class Api::V1::RubygemsController < Api::BaseController
 
   def index
     @rubygems = current_user.rubygems.with_versions
-    respond_to do |wants|
-      wants.any(:json, :all) { render :json => @rubygems }
-      wants.xml              { render :xml  => @rubygems }
+    respond_to do |format|
+      format.json { render :json => @rubygems }
+      format.xml  { render :xml  => @rubygems }
+      # Convert object to JSON and back before converting to YAML in order to
+      # strip the object type (e.g. !ruby/ActiveRecord:Rubygem) from response
+      format.yaml { render :text => JSON.load(@rubygems.to_json).to_yaml }
     end
   end
 
   def show
     if @rubygem.hosted?
-      respond_to do |wants|
-        wants.json { render :json => @rubygem }
-        wants.xml  { render :xml  => @rubygem }
+      respond_to do |format|
+        format.json { render :json => @rubygem }
+        format.xml  { render :xml  => @rubygem }
+        # Convert object to JSON and back before converting to YAML in order to
+        # strip the object type (e.g. !ruby/ActiveRecord:Rubygem) from response
+        format.yaml { render :text => JSON.load(@rubygem.to_json).to_yaml }
       end
     else
-      render :text => "This gem does not exist.", :status => :not_found
+      render :text => "This package does not exist.", :status => :not_found
     end
   end
 
@@ -35,34 +43,35 @@ class Api::V1::RubygemsController < Api::BaseController
   def yank
     if @version.indexed?
       @rubygem.yank!(@version)
-      render :json => "Successfully yanked gem: #{@version.to_title}"
+      render :text => "Successfully yanked package: #{@version.to_title}"
     else
-      render :json => "The version #{params[:version]} has already been yanked.", :status => :unprocessable_entity
+      render :text => "The version #{params[:version]} has already been yanked.", :status => :unprocessable_entity
     end
   end
 
   def unyank
     if !@version.indexed?
       @version.unyank!
-      render :json => "Successfully unyanked gem: #{@version.to_title}"
+      render :text => "Successfully unyanked package: #{@version.to_title}"
     else
-      render :json => "The version #{params[:version]} is already indexed.", :status => :unprocessable_entity
+      render :text => "The version #{params[:version]} is already indexed.", :status => :unprocessable_entity
     end
   end
 
   private
-    def validate_gem_and_version
-      if !@rubygem.hosted?
-        render :json => "This gem does not exist.", :status => :not_found
-      elsif !@rubygem.owned_by?(current_user)
-        render :json => "You do not have permission to yank this gem.", :status => :forbidden
-      else
-        begin
-          slug = params[:platform].blank? ? params[:version] : "#{params[:version]}-#{params[:platform]}"
-          @version = Version.find_from_slug!(@rubygem, slug)
-        rescue ActiveRecord::RecordNotFound
-          render :json => "The version #{params[:version]} does not exist.", :status => :not_found
-        end
+
+  def validate_gem_and_version
+    if !@rubygem.hosted?
+      render :text => "This package does not exist.", :status => :not_found
+    elsif !@rubygem.owned_by?(current_user)
+      render :text => "You do not have permission to yank this package.", :status => :forbidden
+    else
+      begin
+        slug = params[:platform].blank? ? params[:version] : "#{params[:version]}-#{params[:platform]}"
+        @version = Version.find_from_slug!(@rubygem, slug)
+      rescue ActiveRecord::RecordNotFound
+        render :text => "The version #{params[:version]} does not exist.", :status => :not_found
       end
     end
+  end
 end

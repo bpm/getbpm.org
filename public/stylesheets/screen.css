@@ -417,6 +417,7 @@ table {
   display: block;
   margin-left: 582px;
   margin-top: 42px;
+  height: 32px;
   position: absolute;
 }
 
@@ -451,6 +452,7 @@ table {
 
 .main .info #markup {
   margin: 20px 0;
+  color: #000;
 }
 
 .main .info .meta .admin {
@@ -664,6 +666,28 @@ table {
   padding-top: 2em;
   padding-bottom: 2em;
   border-bottom: 1px solid #B4AC99;
+}
+
+.main .info .meta .bundler {
+  padding-top: 2em;
+  padding-bottom: 2em;
+  border-bottom: 1px solid #B4AC99;
+}
+
+.main .info .meta .bundler pre {
+  display: block;
+  margin: 0;
+}
+
+.main .info .meta .bundler #github_clippy {
+  margin-left: 3px;
+  display: inline-block;
+  height: 10px;
+}
+
+.main .info .meta .bundler h5 {
+  margin-bottom: 0.7em;
+  display: inline-block;
 }
 
 .main .info .meta .links h5 {
@@ -899,22 +923,19 @@ table {
   margin-top: -15px;
 }
 
-.footer .links #thoughtbot {
+.footer .links .sponsor {
   float: right;
   font-size: 1em;
   margin-top: -25px;
-}
-
-.footer .links #strobe {
-  margin-top: -14px;
-  font-size: 1em;
-  float: right;
-  margin-right: 25px;
   margin-bottom: 20px;
+  margin-left: 10px;
 }
 
-.footer .links #thoughtbot img,
-.footer .links #strobe img {
+.footer .links #dnsimple img {
+  margin-top: 13px;
+}
+
+.footer .links .sponsor img {
   padding-top: 5px;
   display: block;
 }
@@ -981,7 +1002,7 @@ label, .form_links {
   background: #d2c8b2;
   border: none;
   padding: 15px;
-  font-size: 48px;
+  font-size: 46px;
   -moz-box-shadow: inset 0 3px 3px #706751;
   -webkit-box-shadow: inset 0 3px 3px #706751;
   box-shadow: inset 0 3px 3px #706751;
@@ -1014,7 +1035,7 @@ label, .form_links {
   color: #b40000;
   font-size: 24px;
   clear: both;
-  margin-bottom: 25px;
+  margin: 20px 0 10px 0;
 }
 
 .edit_user .avatar_field {

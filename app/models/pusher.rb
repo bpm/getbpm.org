@@ -55,7 +55,12 @@ class Pusher
   end
 
   def pull_spec
-    @spec = Gem::Format.from_io(body).spec
+    Gem::Package.open body, "r", nil do |pkg|
+      @spec = pkg.metadata
+      return true
+    end
+
+    false
   rescue Gem::Package::FormatError
     notify("GetBPM.org cannot process this package.\nPlease try rebuilding it" +
            " and installing it locally to make sure it's valid.", 422)
@@ -87,16 +92,30 @@ class Pusher
     "<Gemcutter #{attrs.join(' ')}>"
   end
 
+  def minimize_specs(data)
+    names     = Hash.new { |h,k| h[k] = k }
+    versions  = Hash.new { |h,k| h[k] = Gem::Version.new(k) }
+    platforms = Hash.new { |h,k| h[k] = k }
+
+    data.each do |row|
+      row[0] = names[row[0]]
+      row[1] = versions[row[1].strip]
+      row[2] = platforms[row[2]]
+    end
+
+    data
+  end
+
   def specs_index
-    Version.with_indexed(true).map(&:to_index)
+    minimize_specs Version.rows_for_index
   end
 
   def latest_index
-    Version.latest.with_indexed.map(&:to_index)
+    minimize_specs Version.rows_for_latest_index
   end
 
   def prerelease_index
-    Version.prerelease.with_indexed(true).map(&:to_index)
+    minimize_specs Version.rows_for_prerelease_index
   end
 
   def perform
@@ -121,16 +140,16 @@ class Pusher
     end
   end
 
-   def self.indexer
-     @indexer ||=
-       begin
-         indexer = Gem::Indexer.new(server_path, :build_legacy => false)
-         def indexer.say(message) end
-         indexer
-       end
-   end
+  def self.indexer
+    @indexer ||=
+      begin
+        indexer = Gem::Indexer.new(server_path, :build_legacy => false)
+        def indexer.say(message) end
+        indexer
+      end
+  end
 
-   def log(message)
-     Rails.logger.info "[GEMCUTTER:#{Time.now}] #{message}"
-   end
+  def log(message)
+    Rails.logger.info "[GEMCUTTER:#{Time.now}] #{message}"
+  end
 end

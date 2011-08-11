@@ -4,6 +4,72 @@ class VersionTest < ActiveSupport::TestCase
   should belong_to :rubygem
   should have_many :dependencies
 
+  context "#as_json" do
+    setup do
+      @version = Factory(:version)
+    end
+
+    should "only have relevant API fields" do
+      json = @version.as_json
+      assert_equal %w[number built_at summary description authors platform prerelease downloads_count].map(&:to_s).sort, json.keys.sort
+      assert_equal @version.authors, json["authors"]
+      assert_equal @version.built_at, json["built_at"]
+      assert_equal @version.description, json["description"]
+      assert_equal @version.downloads_count, json["downloads_count"]
+      assert_equal @version.number, json["number"]
+      assert_equal @version.platform, json["platform"]
+      assert_equal @version.prerelease, json["prerelease"]
+      assert_equal @version.summary, json["summary"]
+    end
+  end
+
+  context "#to_xml" do
+    setup do
+      @version = Factory(:version)
+    end
+
+    should "only have relevant API fields" do
+      xml = Nokogiri.parse(@version.to_xml)
+      assert_equal %w[number built-at summary description authors platform prerelease downloads-count].map(&:to_s).sort, xml.root.children.map{|a| a.name}.reject{|t| t == "text"}.sort
+      assert_equal @version.authors, xml.at_css("authors").content
+      assert_equal @version.built_at.to_i, xml.at_css("built-at").content.to_time.to_i
+      assert_equal @version.description, xml.at_css("description").content
+      assert_equal @version.downloads_count, xml.at_css("downloads-count").content.to_i
+      assert_equal @version.number, xml.at_css("number").content
+      assert_equal @version.platform, xml.at_css("platform").content
+      assert_equal @version.prerelease.to_s, xml.at_css("prerelease").content
+      assert_equal @version.summary.to_s, xml.at_css("summary").content
+    end
+  end
+
+  context "updated gems" do
+    setup do
+      Timecop.freeze Date.today
+      @existing_gem = Factory(:rubygem)
+      @second = Factory(:version, :rubygem => @existing_gem, :created_at => 1.day.ago)
+      @fourth = Factory(:version, :rubygem => @existing_gem, :created_at => 4.days.ago)
+
+      @another_gem = Factory(:rubygem)
+      @third  = Factory(:version, :rubygem => @another_gem, :created_at => 3.days.ago)
+      @first  = Factory(:version, :rubygem => @another_gem, :created_at => 1.minute.ago)
+      @yanked = Factory(:version, :rubygem => @another_gem, :created_at => 30.seconds.ago)
+      @yanked.yank!
+
+      @bad_gem = Factory(:rubygem)
+      @only_one = Factory(:version, :rubygem => @bad_gem, :created_at => 1.minute.ago)
+    end
+
+    teardown do
+      Timecop.return
+    end
+
+    should "order gems by created at and show only gems that have more than one version" do
+      versions = Version.just_updated
+      assert_equal 4, versions.size
+      assert_equal [@first, @second, @third, @fourth], versions
+    end
+  end
+
   context "with a rubygem" do
     setup do
       @rubygem = Factory(:rubygem)
@@ -27,6 +93,22 @@ class VersionTest < ActiveSupport::TestCase
       @version.dependencies << Factory(:dependency, :version => @version, :rubygem => @dependency)
       assert ! Version.with_deps.first.dependencies.empty?
     end
+
+    should "sort dependencies alphabetically" do
+      @version = Factory.build(:version, :rubygem => @rubygem, :number => "1.0.0", :platform => "ruby")
+
+      @first_dependency_by_alpha = Factory(:rubygem, :name => 'acts_as_indexed')
+      @second_dependency_by_alpha = Factory(:rubygem, :name => 'friendly_id')
+      @third_dependency_by_alpha = Factory(:rubygem, :name => 'refinerycms')
+
+      @version.dependencies << Factory(:dependency, :version => @version, :rubygem => @second_dependency_by_alpha)
+      @version.dependencies << Factory(:dependency, :version => @version, :rubygem => @third_dependency_by_alpha)
+      @version.dependencies << Factory(:dependency, :version => @version, :rubygem => @first_dependency_by_alpha)
+
+      assert @first_dependency_by_alpha.name, @version.dependencies.first.name
+      assert @second_dependency_by_alpha.name, @version.dependencies[1].name
+      assert @third_dependency_by_alpha.name, @version.dependencies.last.name
+    end
   end
 
   context "with a version" do
@@ -40,6 +122,11 @@ class VersionTest < ActiveSupport::TestCase
     should_not allow_value("1.2.3-\"[javalol]\"").for(:number)
     should_not allow_value("0.8.45::Gem::PLATFORM::FAILBOAT").for(:number)
     should_not allow_value("1.2.3\n<bad>").for(:number)
+
+    should allow_value("ruby").for(:platform)
+    should allow_value("mswin32").for(:platform)
+    should allow_value("x86_64-linux").for(:platform)
+    should_not allow_value("Gem::Platform::Ruby").for(:platform)
 
     should "give number for #to_s" do
       assert_equal @version.number, @version.to_s
@@ -96,8 +183,8 @@ class VersionTest < ActiveSupport::TestCase
     should "tack on prerelease flag" do
       @version.update_attributes(:number => "0.3.0.pre")
       new_version = Factory(:version, :rubygem  => @version.rubygem,
-                                      :built_at => 1.day.from_now,
-                                      :number   => "0.4.0.pre")
+                            :built_at => 1.day.from_now,
+                            :number   => "0.4.0.pre")
 
       assert @version.prerelease
       assert new_version.prerelease
@@ -113,8 +200,8 @@ class VersionTest < ActiveSupport::TestCase
     should "give no version count for the latest prerelease version" do
       @version.update_attributes(:number => "0.3.0.pre")
       old_version = Factory(:version, :rubygem  => @version.rubygem,
-                                      :built_at => 1.day.from_now,
-                                      :number   => "0.2.0")
+                            :built_at => 1.day.from_now,
+                            :number   => "0.2.0")
 
       assert @version.prerelease
       assert !old_version.prerelease
@@ -125,9 +212,17 @@ class VersionTest < ActiveSupport::TestCase
       assert_equal "gem install #{old_version.rubygem.name}", old_version.to_install
     end
 
-
     should "give title for #to_title" do
       assert_equal "#{@version.rubygem.name} (#{@version.to_s})", @version.to_title
+    end
+
+    should "give version with twiddle-wakka for #to_bundler" do
+      assert_equal %{gem "#{@version.rubygem.name}", "~> #{@version.to_s}"}, @version.to_bundler
+    end
+
+    should "give title and platform for #to_title" do
+      @version.platform = "zomg"
+      assert_equal "#{@version.rubygem.name} (#{@version.number}-zomg)", @version.to_title
     end
 
     should "have description for info" do
@@ -150,41 +245,7 @@ class VersionTest < ActiveSupport::TestCase
     should "have some text for info if neither summary or description exist" do
       @version.description = nil
       @version.summary = nil
-      assert_equal "This rubygem does not have a description or summary.", @version.info
-    end
-
-    should "create a gem spec" do
-      spec = @version.to_spec
-      assert spec.is_a?(Gem::Specification)
-      assert_equal @version.rubygem.name, spec.name
-      assert_equal @version.number, spec.version.to_s
-      assert_equal [@version.authors], spec.authors
-      assert_equal @version.description, spec.description
-      assert_equal @version.summary, spec.summary
-
-      date = @version.built_at
-      assert_equal Time.utc(date.year, date.month, date.day), spec.date
-    end
-
-    should "join multiple authors on gemspecs" do
-      @version.authors = "Geddy Lee, Neil Peart, Alex Lifeson"
-      assert_equal ["Geddy Lee", "Neil Peart", "Alex Lifeson"], @version.to_spec.authors
-    end
-
-    should "create gemspec with some dependencies" do
-      @dep_one = Factory(:dependency, :version => @version, :requirements => ">= 0, = 1.2.3")
-      @dep_two = Factory(:dependency, :version => @version, :requirements => "= 3.0.0")
-      spec = @version.to_spec
-
-      @spec_dep_one = spec.dependencies.detect { |d| d.name == @dep_one.rubygem.name }
-      @spec_dep_two = spec.dependencies.detect { |d| d.name == @dep_two.rubygem.name }
-
-      assert_equal 2, spec.dependencies.size
-      assert @spec_dep_one
-      assert @spec_dep_two
-
-      assert_equal @dep_one.requirements.split(", "), @spec_dep_one.requirements_list
-      assert_equal @dep_two.requirements.split(", "), @spec_dep_two.requirements_list
+      assert_equal "This package does not have a description or summary.", @version.info
     end
 
     context "when yanked" do
@@ -310,10 +371,11 @@ class VersionTest < ActiveSupport::TestCase
       @rack = Factory(:version, :authors => %w[rack], :built_at => 1.day.ago)
       @haml = Factory(:version, :authors => %w[haml], :built_at => 1.hour.ago)
       @dust = Factory(:version, :authors => %w[dust], :built_at => 1.day.from_now)
+      @fake = Factory(:version, :authors => %w[fake], :indexed => false, :built_at => 1.minute.ago)
     end
 
     should "get the latest versions up to today" do
-      assert_equal [@haml, @rack, @thor, @json, @rake].map(&:authors),        Version.published.map(&:authors)
+      assert_equal [@haml, @rack, @thor, @json, @rake].map(&:authors),        Version.published(5).map(&:authors)
       assert_equal [@haml, @rack, @thor, @json, @rake, @thin].map(&:authors), Version.published(6).map(&:authors)
     end
   end
@@ -327,10 +389,6 @@ class VersionTest < ActiveSupport::TestCase
       @unowned   = Factory(:version)
 
       Factory(:ownership, :rubygem => @gem, :user => @user, :approved => true)
-    end
-
-    should "find versions that have other associated versions" do
-      assert_equal [@owned_one, @owned_two], Version.with_associated
     end
 
     should "return the owned gems from #owned_by" do
@@ -391,9 +449,10 @@ class VersionTest < ActiveSupport::TestCase
 
     [/foo/, 1337, {:foo => "bar"}].each do |example|
       should "be empty with authors as an Array of #{example.class}'s" do
-        @spec.authors = [example]
-        @version.update_attributes_from_gem_specification!(@spec)
-        assert_equal "", @version.authors
+        assert_raise ActiveRecord::RecordInvalid do
+          @spec.authors = [example]
+          @version.update_attributes_from_gem_specification!(@spec)
+        end
       end
     end
 
@@ -405,6 +464,39 @@ class VersionTest < ActiveSupport::TestCase
       assert_equal @spec.description,        @version.description
       assert_equal @spec.summary,            @version.summary
       assert_equal @spec.date,               @version.built_at
+    end
+  end
+
+  context "indexes" do
+    setup do
+      @first_rubygem  = Factory(:rubygem, :name => "first")
+      @second_rubygem = Factory(:rubygem, :name => "second")
+
+      @first_version  = Factory(:version, :rubygem => @first_rubygem,  :number => "0.0.1", :platform => "ruby")
+      @second_version = Factory(:version, :rubygem => @first_rubygem,  :number => "0.0.2", :platform => "ruby")
+      @other_version  = Factory(:version, :rubygem => @second_rubygem, :number => "0.0.2", :platform => "java")
+      @pre_version    = Factory(:version, :rubygem => @second_rubygem, :number => "0.0.2.pre", :platform => "java", :prerelease => true)
+    end
+
+    should "select all gems" do
+      assert_equal [
+        ["first",  "0.0.1", "ruby"],
+        ["first",  "0.0.2", "ruby"],
+        ["second", "0.0.2", "java"]
+      ], Version.rows_for_index
+    end
+
+    should "select only most recent" do
+      assert_equal [
+        ["first",  "0.0.2", "ruby"],
+        ["second", "0.0.2", "java"]
+      ], Version.rows_for_latest_index
+    end
+
+    should "select only prerelease" do
+      assert_equal [
+        ["second", "0.0.2.pre", "java"]
+      ], Version.rows_for_prerelease_index
     end
   end
 end

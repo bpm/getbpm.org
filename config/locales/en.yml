@@ -7,7 +7,200 @@ en:
   please_confirm: "Access Denied. Please confirm your GetBPM.org account."
   feed_subscribed: "GetBPM.org | Subscribed Packages"
   feed_latest: "GetBPM.org | Latest Packages"
+  time_ago: "%{duration} ago"
+  download_count: "%{count} downloads"
+  form_disable_with: "Please wait..."
+  update: Update
+  edit: Edit
+
+  dashboards:
+    show:
+      latest: "Latest Updates"
+      latest_title: "Latest Updates RSS Feed"
+      no_subscriptions: "You're not subscribed to any packages yet. Visit a %{gem_link} to subscribe to one!"
+      gem_link_text: "package page"
+      mine: "My Packages"
+      no_owned: "You haven't pushed any packages yet. Perhaps check out the guides on %{creating_link} a package or %{migrating_link} a package from RubyForge."
+      creating_link_text: 'creating'
+      migrating_link_text: 'migrating'
+      my_subscriptions: 'My Subscriptions'
+
+  home:
+    index:
+      gems_header: "of %{gem_count} packages built since July 2009"
+      welcome_blurb: "Welcome to your community BPM Package host."
+      find_blurb: "Find your packages easier, publish them faster, and have fun doing it."
+      learn:
+        header: 'learn'
+        install_rubygems: "Install BPM %{version}"
+        rubygems_subtitle: "Ruby's premier packaging system"
+        browse_docs: "Browse the Docs"
+        docs_subtitle: "The comprehensive guide on BPM"
+        gem_specification: "BPM Package Specification"
+        spec_subtitle: "Your package's interface to the world"
+      share:
+        header: share
+        update: "Update to the latest BPM version"
+        build: "Build your package"
+        deploy: "Deploy your package instantly"
+      pitch:
+        content: "%{rubygems} is the BPM community's package hosting service. %{publish} your packages and install them. %{api} to interact and find out more information about available packages. %{contribute} and enhance the site with your own changes."
+        publish: Instantly publish
+        api: Use the API
+        contribute: Become a contributor
+      leaderboards:
+        header: leaderboards
+        new: New Packages
+        downloaded: Most Downloaded Today
+        no_downloaded: No downloads today
+        updated: Just Updated
+
+  layouts:
+    application:
+      header:
+        all_gems: "all packages"
+        dashboard: "dashboard"
+        sign_in: "sign in"
+        sign_up: "sign up"
+        sign_out: "sign out"
+      footer:
+        about: "About"
+        blog: "Blog"
+        guides: "Guides"
+        help: "Help"
+        status: "Status"
+        source_code: "Code"
+        discussion_forum: "Discuss"
+        statistics: "Stats"
+        designed_by: "designed by %{designer}"
+        designed_by_title: "Designed by %{designer}"
+        resolved_with: "resolved with %{resolver}"
+        resolved_with_title: "Resolved with %{resolver}"
+        supported_by: "hosted by %{supporter}"
+        supported_by_title: "Hosted by %{supporter}"
+
+  pages:
+    about:
+      title: About
+      subtitle: what this is
+      purpose:
+        header: "Welcome to %{site}, the BPM community's packages hosting service. The purpose of this project is three-fold:"
+        better_api: Provide a better API for dealing with packages
+        transparent_pages: Create more transparent and accessible project pages
+        enable_community: Enable the community to improve and enhance the site
+      founding: "The project was started in April 2009 by %{founder}, and has since grown to include the contributions of over %{contributors} and %{downloads}."
+      support: "BPM is currently maintained by %{strobe}. %{github} has also been invaluable for helping us collaborate and share code easily."
+      technical: "Some insights into the technical aspects of the site: It's 100% Ruby. The main site is a %{rails} application, and the package serving is done through %{sinatra}. Packages are hosted on %{s3}, and the time between publishing a new package and having it ready for installation is minimal. For more info, %{source_code}, which is %{license} over at GitHub."
+    create:
+      title: create
+      notice: This page has been moved onto BPM's new support site.
+
+  passwords:
+    edit:
+      title: reset password
+      submit: Save this password
+    new:
+      title: change your password
+      will_email_notice: We will email you a link to change your password.
+      submit: Reset password
+
+  profiles:
+    edit:
+      title: Edit Profile
+      reset_password:
+        title: Reset password
+        text: "Need a new password? No problem. %{link}"
+        link_text: Request a new one here.
+      api_access:
+        title: API Access
+        key_is: "Your API key is %{key}."
+        credentials: "If you want to use %{gem_commands_link} from the command line, you'll need a %{gem_credentials_file} file, which you can generate using the following command:"
+        link_text: bpm commands
+        reset: Reset my API key
+        confirm_reset: Are you sure? This cannot be undone.
+
+  rubygems:
+    dependencies:
+      header: "%{title} Dependencies"
+    edit:
+      title: "edit package links"
+      subtitle: "for %{gem}"
+      other_fields_notice: All other fields can only be edited by pushing an updated version of your package.
+    index:
+      title: 'all packages'
+      subtitle: 'starting with %{prefix}'
+    show:
+      not_hosted_notice: This package is not currently hosted on GetBPM.org.
+      install: install
+      yanked_notice: "This package has been yanked, but it is still available for download for other packages that may have depended on it. For more information or if you need to remove it permanently, %{more_info_link}."
+      yank_info_link_text: please click here
+      stats_header: Stats
+      authors_header: Authors
+      downloads_for_this_version: "%{count} for this version"
+      owners_header: Owners
+      links:
+        header: Links
+        home: Homepage
+        code: Source Code
+        docs: Documentation
+        wiki: Wiki
+        mail: Mailing List
+        bugs: Bug Tracker
+      versions_header: Versions
+      bundler_header: Bundler
+      show_all_versions: "Show all versions (%{count} total)"
+
+  searches:
+    show:
+      subtitle: "for %{query}"
+      exact_match: Exact match
+
+  sessions:
+    new:
+      forgot_password: "Forgot Password?"
+
+  stats:
+    index:
+      gem_count: "%{count} packages"
+      user_count: "%{count} users"
+    show:
+      for: "stats for %{for}"
+      overview: "stats overview"
+      total_downloads: "%{count} total downloads"
+      daily_downloads: "%{count} downloads today"
+      current_rank: current rank today
+      highest_rank: highest rank today
+
+  users:
+    new:
+      rubyforge_banner: "You can now sign in with your %{link}"
+      or_rubyforge: "RubyForge Account too!"
+      have_account: "Already have an account?"
+
+  versions:
+    index:
+      title: "all versions of %{name}"
+      versions_since: "%{count} versions since %{since}"
+    version:
+      yanked: "yanked"
+
   activerecord:
+    attributes:
+      user:
+        avatar: Avatar
+        email: Email address
+        handle: Handle
+        password_confirmation: Confirm password
+        password: Password
+      linkset:
+        bugs: Bug Tracker URL
+        code: Source Code URL
+        docs: Documentation URL
+        mail: Mailing List URL
+        wiki: Wiki URL
+      session:
+        who: Email or Handle
+        password: Password
     errors:
       messages:
         record_invalid: "%{errors}"

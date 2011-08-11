@@ -32,8 +32,8 @@ class Download
     $redis.get(version_key(full_name)).to_i
   end
 
-  def self.most_downloaded_today
-    items = $redis.zrevrange(TODAY_KEY, 0, 4, :with_scores => true)
+  def self.most_downloaded_today(n=5)
+    items = $redis.zrevrange(TODAY_KEY, 0, (n-1), :with_scores => true)
     items.in_groups_of(2).collect do |full_name, downloads|
       version = Version.find_by_full_name(full_name)
 
@@ -42,15 +42,36 @@ class Download
   end
 
   def self.counts_by_day_for_versions(versions, days)
-    dates = (days.days.ago.to_date...Date.today).map &:to_s
+    dates = (days.days.ago.to_date...Time.zone.today).map &:to_s
 
     versions.inject({}) do |downloads, version|
       $redis.hmget(self.history_key(version), *dates).each_with_index do |count, idx|
         downloads["#{version.id}-#{dates[idx]}"] = count.to_i
       end
-      downloads["#{version.id}-#{Date.today}"] = self.today(version)
+      downloads["#{version.id}-#{Time.zone.today}"] = self.today(version)
       downloads
     end
+  end
+
+  def self.counts_by_day_for_version_in_date_range(version, start, stop)
+    downloads = ActiveSupport::OrderedHash.new
+
+    dates = (start..stop).map &:to_s
+
+    $redis.hmget(self.history_key(version), *dates).each_with_index do |count, idx|
+      downloads["#{dates[idx]}"] = count.to_i
+    end
+
+    if stop == Time.zone.today
+      stop -= 1.day
+      downloads["#{Time.zone.today}"] = self.today(version)
+    end
+
+    downloads
+  end
+
+  def self.counts_by_day_for_version(version)
+    counts_by_day_for_version_in_date_range(version, Time.zone.today - 89.days, Time.zone.today)
   end
 
   def self.key(what)

@@ -86,6 +86,9 @@ class DownloadTest < ActiveSupport::TestCase
     assert_equal [[@version_3, 3], [@version_2, 2], [@version_1, 1]],
                  Download.most_downloaded_today
 
+    assert_equal [[@version_3, 3], [@version_2, 2]],
+                 Download.most_downloaded_today(2)
+
     assert_equal 3, Download.cardinality
     assert_equal 1, Download.rank(@version_3)
     assert_equal 2, Download.rank(@version_2)
@@ -119,10 +122,11 @@ class DownloadTest < ActiveSupport::TestCase
     Download.incr(@rubygem_1, @version_2.full_name)
 
     downloads = {
-      "#{@version_1.id}-#{2.days.ago.to_date}" => 0, "#{@version_1.id}-#{Date.yesterday}" => 1, "#{@version_1.id}-#{Date.today}" => 1,
-      "#{@version_2.id}-#{2.days.ago.to_date}" => 0, "#{@version_2.id}-#{Date.yesterday}" => 1, "#{@version_2.id}-#{Date.today}" => 1,
-      "#{@version_3.id}-#{2.days.ago.to_date}" => 0, "#{@version_3.id}-#{Date.yesterday}" => 1, "#{@version_3.id}-#{Date.today}" => 3 }
+      "#{@version_1.id}-#{2.days.ago.to_date}" => 0, "#{@version_1.id}-#{Date.yesterday}" => 1, "#{@version_1.id}-#{Time.zone.today}" => 1,
+      "#{@version_2.id}-#{2.days.ago.to_date}" => 0, "#{@version_2.id}-#{Date.yesterday}" => 1, "#{@version_2.id}-#{Time.zone.today}" => 1,
+      "#{@version_3.id}-#{2.days.ago.to_date}" => 0, "#{@version_3.id}-#{Date.yesterday}" => 1, "#{@version_3.id}-#{Time.zone.today}" => 3 }
 
+    assert_equal downloads.size, 9
     assert_equal downloads, Download.counts_by_day_for_versions([@version_1, @version_2, @version_3], 2)
   end
 

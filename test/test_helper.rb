@@ -1,11 +1,8 @@
 ENV["RAILS_ENV"] = "test"
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
+require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
-
-set :environment, :test
-WebMock.disable_net_connect!
-
 require 'clearance/shoulda_macros'
+require 'capybara/rails'
 
 class ActiveSupport::TestCase
   self.use_transactional_fixtures = true
@@ -14,10 +11,9 @@ class ActiveSupport::TestCase
 end
 
 class Test::Unit::TestCase
-  include Webrat::Matchers
   include Rack::Test::Methods
   include RR::Adapters::TestUnit unless include?(RR::Adapters::TestUnit)
-  include WebMock
+  include WebMock::API
 
   def setup
     RR.reset
@@ -25,8 +21,8 @@ class Test::Unit::TestCase
     $fog.directories.create(:key => $rubygems_config[:s3_bucket], :public => true)
   end
 
-  def response_body
-    @response.body
+  def page
+    Capybara::Node::Simple.new(@response.body)
   end
 
   def assert_changed(object, attribute, &block)
@@ -59,7 +55,29 @@ def gem_specification_from_gem_fixture(name)
 end
 
 def stub_uploaded_token(gem_name, token, status = [200, "Success"])
-  WebMock.stub_request(:get,
-                       "http://#{gem_name}.rubyforge.org/migrate-#{gem_name}.html").
+  WebMock.stub_request(:get, "http://#{gem_name}.rubyforge.org/migrate-#{gem_name}.html").
     to_return(:body => token + "\n", :status => status)
+end
+
+def gem_spec(opts = {})
+  Gem::Specification.new do |s|
+    s.name = %q{test}
+    s.version = opts[:version] || "0.0.0"
+    s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+    s.authors = ["Joe User"]
+    s.description = %q{This is my awesome gem.}
+    s.email = %q{joe@user.com}
+    s.files = [
+      "README.textile",
+      "Rakefile",
+      "VERSION.yml",
+      "lib/test.rb",
+      "test/test_test.rb"
+    ]
+    s.homepage = %q{http://user.com/test}
+  end
+end
+
+def gem_file(name = "test-0.0.0.gem")
+  File.open(File.expand_path("../gems/#{name}", __FILE__))
 end

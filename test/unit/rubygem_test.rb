@@ -19,6 +19,7 @@ class RubygemTest < ActiveSupport::TestCase
     should allow_value("factory_girl").for(:name)
     should allow_value("rack-test").for(:name)
     should allow_value("perftools.rb").for(:name)
+    should_not allow_value("\342\230\203").for(:name)
 
     should "reorder versions with platforms properly" do
       version3_ruby  = Factory(:version, :rubygem => @rubygem, :number => "3.0.0", :platform => "ruby")
@@ -81,6 +82,17 @@ class RubygemTest < ActiveSupport::TestCase
       assert_equal version3_ruby, @rubygem.versions.most_recent
     end
 
+    should "can find when the first built date was" do
+      Timecop.travel(DateTime.now) do
+        Factory(:version, :rubygem => @rubygem, :number => "3.0.0", :built_at => 1.day.ago)
+        Factory(:version, :rubygem => @rubygem, :number => "2.0.0", :built_at => 2.days.ago)
+        Factory(:version, :rubygem => @rubygem, :number => "1.0.0", :built_at => 3.days.ago)
+        Factory(:version, :rubygem => @rubygem, :number => "1.0.0.beta", :built_at => 4.days.ago)
+
+        assert_equal 4.days.ago.to_date, @rubygem.first_built_date.to_date
+      end
+    end
+
     should "have a most_recent version if only a platform version exists" do
       version1 = Factory(:version, :rubygem => @rubygem, :number => "1.0.0", :platform => "linux")
 
@@ -135,9 +147,13 @@ class RubygemTest < ActiveSupport::TestCase
     should "remove invalid versions" do
       @version = Factory.build(:version)
       @specification = gem_specification_from_gem_fixture('test-0.0.0')
-      @specification.authors = ["bad", 3, "authors"]
-      @rubygem.update_versions!(@version, @specification)
-      assert_equal "bad, authors", @version.authors
+      @specification.authors = [3]
+
+      assert_raise ActiveRecord::RecordInvalid do
+        @rubygem.update_versions!(@version, @specification)
+      end
+
+      assert_equal "Authors must be an Array of Strings", @rubygem.all_errors(@version)
     end
 
     should "return more than one error joined for #all_errors" do
@@ -196,14 +212,14 @@ class RubygemTest < ActiveSupport::TestCase
       end
 
       should "be not owned by a user in unapproved ownership" do
-        ownership = Factory(:ownership, :user => @user, :rubygem => @rubygem)
+        ownership = Factory(:ownership, :user => @user, :rubygem => @rubygem, :approved => false)
         assert !@rubygem.owned_by?(@user)
         assert @rubygem.unowned?
       end
 
       should "be not owned by a user without ownership" do
         other_user = Factory(:user)
-        ownership = Factory(:ownership, :user => other_user, :rubygem => @rubygem)
+        ownership = Factory(:ownership, :user => other_user, :rubygem => @rubygem, :approved => false)
         assert !@rubygem.owned_by?(@user)
         assert @rubygem.unowned?
       end
@@ -298,7 +314,7 @@ class RubygemTest < ActiveSupport::TestCase
         version = Factory(:version, :rubygem => @rubygem)
       end
 
-      should "return a bunch of json" do
+      should "return a bunch of JSON" do
         hash = JSON.parse(@rubygem.to_json)
 
         assert_equal @rubygem.linkset.home, hash["homepage_uri"]
@@ -309,7 +325,7 @@ class RubygemTest < ActiveSupport::TestCase
         assert_equal @rubygem.linkset.bugs, hash["bug_tracker_uri"]
       end
 
-      should "return a bunch of xml" do
+      should "return a bunch of XML" do
         doc = Nokogiri.parse(@rubygem.to_xml)
 
         assert_equal @rubygem.linkset.home, doc.at_css("homepage-uri").content
@@ -457,6 +473,11 @@ class RubygemTest < ActiveSupport::TestCase
       assert Rubygem.search('PIE').include?(@apple_pie)
     end
 
+    should "find rubygems with missing punctuation on #search" do
+      assert Rubygem.search('apple crisp').include?(@apple_crisp)
+      assert ! Rubygem.search('apple crisp').include?(@apple_pie)
+    end
+
     should "sort results by number of downloads, descending" do
       assert_equal [@apple_crisp, @apple_pie], Rubygem.search('apple')
     end
@@ -537,11 +558,11 @@ class RubygemTest < ActiveSupport::TestCase
       @rubygem = Factory(:rubygem)
       @version = Factory(:version, :rubygem => @rubygem)
 
-      Timecop.freeze DateTime.parse("2010-10-2")
+      Timecop.freeze DateTime.parse("2010-10-02")
       1.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("2010-10-3")
+      Timecop.freeze DateTime.parse("2010-10-03")
       6.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
@@ -549,11 +570,11 @@ class RubygemTest < ActiveSupport::TestCase
       4.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("2010-11-1")
+      Timecop.freeze DateTime.parse("2010-11-01")
       2.times { Download.incr(@rubygem.name, @version.full_name) }
       Download.rollover
 
-      Timecop.freeze DateTime.parse("2010-11-2")
+      Timecop.freeze DateTime.parse("2010-11-02")
     end
 
     should "give counts from the past 30 days" do

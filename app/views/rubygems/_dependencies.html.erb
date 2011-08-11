@@ -1,10 +1,12 @@
 <% if dependencies.present? && @latest_version.indexed %>
   <div class="dependencies" id="<%= dependencies.first.scope %>_dependencies">
-    <h5><%= dependencies.first.scope.titleize %> Dependencies</h5>
+    <h5><%= t '.header', :title => dependencies.first.scope.titleize %></h5>
     <ol>
     <% dependencies.each do |dependency| %>
       <li>
-        <%= link_to "<strong>#{dependency.rubygem.name}</strong> #{dependency.requirements}".html_safe, dependency.rubygem %>
+        <a href="<%= rubygem_url(dependency.rubygem) %>">
+          <strong><%= dependency.rubygem.name %></strong> <%= dependency.requirements %>
+        </a>
       </li>
     <% end %>
     </ol>

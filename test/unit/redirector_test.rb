@@ -43,11 +43,32 @@ class RedirectorTest < ActiveSupport::TestCase
      /export
      /shelf/9000
      /syndicate.xml].each do |uri|
-    should "redirect to docs.rubygems.org when #{uri} is hit" do
+    should "redirect to docs.getbpm.org when #{uri} is hit" do
       get uri, {}, {"HTTP_HOST" => HOST}
 
       assert_equal 301, last_response.status
-      assert_equal "http://docs.rubygems.org#{uri}", last_response.headers["Location"]
+      assert_equal "http://docs.getbpm.org#{uri}", last_response.headers["Location"]
     end
+  end
+
+  should "redirect request to docs to guides " do
+    get "/pages/docs", {}, {"HTTP_HOST" => HOST}
+
+    assert_equal 301, last_response.status
+    assert_equal "http://guides.getbpm.org", last_response.headers["Location"]
+  end
+
+  should "redirect request to gem docs to guides " do
+    get "/pages/gem_docs", {}, {"HTTP_HOST" => HOST}
+
+    assert_equal 301, last_response.status
+    assert_equal "http://guides.getbpm.org/command-reference", last_response.headers["Location"]
+  end
+
+  should "redirect request to api docs to guides " do
+    get "/pages/api_docs", {}, {"HTTP_HOST" => HOST}
+
+    assert_equal 301, last_response.status
+    assert_equal "http://guides.getbpm.org/rubygems-org-api", last_response.headers["Location"]
   end
 end

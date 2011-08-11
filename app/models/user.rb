@@ -1,9 +1,10 @@
 class User < ActiveRecord::Base
   include Clearance::User
+  include Gravtastic
   is_gravtastic :default => "retro"
 
-  attr_accessible :handle, :password_confirmation, :password, :email
-  attr_accessible :handle, :website, :location, :bio
+  attr_accessible :bio, :email, :handle, :location, :password,
+                  :password_confirmation, :website
 
   has_many :rubygems, :through    => :ownerships,
                       :conditions => { 'ownerships.approved' => true }
@@ -61,11 +62,15 @@ class User < ActiveRecord::Base
   end
 
   def as_json(options={})
-    { 'email' => email }
+    {'email' => email}
+  end
+
+  def to_xml(options={})
+    {'email' => email}.to_xml(options.merge(:root => 'user'))
   end
 
   def to_yaml(*args)
-    { 'email' => email }.to_yaml(*args)
+    {'email' => email}.to_yaml(*args)
   end
 
   def regenerate_token
@@ -96,7 +101,7 @@ class User < ActiveRecord::Base
   end
 
   def rubygems_downloaded(limit = 10, offset = 0)
-    chain = rubygems.order("rubygems.downloads desc").offset(offset)
+    chain = rubygems.by_downloads.offset(offset)
     chain = chain.limit(limit) if limit
     chain
   end

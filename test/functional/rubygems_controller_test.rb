@@ -19,7 +19,7 @@ class RubygemsControllerTest < ActionController::TestCase
       should assign_to :rubygem
       should "renders owner packages overview links" do
         @owners.each do |owner|
-          assert_have_selector "a[href='#{profile_path(owner.display_id)}']"
+          assert page.has_selector?("a[href='#{profile_path(owner.display_id)}']")
         end
       end
     end
@@ -34,7 +34,7 @@ class RubygemsControllerTest < ActionController::TestCase
       should render_template :show
       should assign_to :rubygem
       should "not render edit link" do
-        assert_have_no_selector "a[href='#{edit_rubygem_path(@rubygem)}']"
+        assert ! page.has_selector?("a[href='#{edit_rubygem_path(@rubygem)}']")
       end
     end
 
@@ -48,7 +48,7 @@ class RubygemsControllerTest < ActionController::TestCase
       should render_template :show
       should assign_to :rubygem
       should "render edit link" do
-        assert_have_selector "a[href='#{edit_rubygem_path(@rubygem)}']"
+        assert page.has_selector?("a[href='#{edit_rubygem_path(@rubygem)}']")
       end
     end
 
@@ -63,10 +63,10 @@ class RubygemsControllerTest < ActionController::TestCase
       should assign_to(:rubygem) { @rubygem }
       should respond_with :success
       should "have an invisible subscribe link" do
-        assert_have_selector "a[style='display:none']", :content => 'Subscribe'
+        assert page.has_selector?("a[style='display:none']", :content => 'Subscribe')
       end
       should "have a visible unsubscribe link" do
-        assert_have_selector "a[style='display:inline-block']", :content => 'Unsubscribe'
+        assert page.has_selector?("a[style='display:inline-block']", :content => 'Unsubscribe')
       end
     end
 
@@ -80,10 +80,10 @@ class RubygemsControllerTest < ActionController::TestCase
       should assign_to(:rubygem) { @rubygem }
       should respond_with :success
       should "have a visible subscribe link" do
-        assert_have_selector "a[style='display:inline-block']", :content => 'Subscribe'
+        assert page.has_selector?("a[style='display:inline-block']", :content => 'Subscribe')
       end
       should "have an invisible unsubscribe link" do
-        assert_have_selector "a[style='display:none']", :content => 'Unsubscribe'
+        assert page.has_selector?("a[style='display:none']", :content => 'Unsubscribe')
       end
     end
 
@@ -97,13 +97,13 @@ class RubygemsControllerTest < ActionController::TestCase
       should render_template :edit
       should assign_to :rubygem
       should "render form" do
-        assert_have_selector "form"
-        assert_have_selector "input#linkset_code"
-        assert_have_selector "input#linkset_docs"
-        assert_have_selector "input#linkset_wiki"
-        assert_have_selector "input#linkset_mail"
-        assert_have_selector "input#linkset_bugs"
-        assert_have_selector "input[type='submit']"
+        assert page.has_selector?("form")
+        assert page.has_selector?("input#linkset_code")
+        assert page.has_selector?("input#linkset_docs")
+        assert page.has_selector?("input#linkset_wiki")
+        assert page.has_selector?("input#linkset_mail")
+        assert page.has_selector?("input#linkset_bugs")
+        assert page.has_selector?("input[type='submit']")
       end
     end
 
@@ -147,7 +147,7 @@ class RubygemsControllerTest < ActionController::TestCase
         assert_not_equal @url, Rubygem.last.linkset.code
       end
       should "render error messages" do
-        assert_contain /error(s)? prohibited/m
+        assert page.has_content?("error prohibited")
       end
     end
   end
@@ -168,12 +168,12 @@ class RubygemsControllerTest < ActionController::TestCase
     should assign_to(:gems) { @gems }
     should "render links" do
       @gems.each do |g|
-        assert_contain g.name
-        assert_have_selector "a[href='#{rubygem_path(g)}']"
+        assert page.has_content?(g.name)
+        assert page.has_selector?("a[href='#{rubygem_path(g)}']")
       end
     end
     should "display uppercase A" do
-      assert_contain "starting with A"
+      assert page.has_content?("starting with A")
     end
   end
 
@@ -190,7 +190,7 @@ class RubygemsControllerTest < ActionController::TestCase
 
     should "render posts with platform-specific titles and links of all subscribed versions" do
       @versions.each do |v|
-        assert_select "entry > title", :count => 1, :text => (v.platformed? ? "#{v.to_title} #{v.platform}" : v.to_title)
+        assert_select "entry > title", :count => 1, :text => v.to_title
         assert_select "entry > link[href='#{rubygem_version_url(v.rubygem, v.slug)}']", :count => 1
         assert_select "entry > id", :count => 1, :text => rubygem_version_url(v.rubygem, v.slug)
       end
@@ -221,11 +221,11 @@ class RubygemsControllerTest < ActionController::TestCase
     should render_template :index
     should assign_to(:gems) { [@zgem] }
     should "render links" do
-      assert_contain @zgem.name
-      assert_have_selector "a[href='#{rubygem_path(@zgem)}']"
+      assert page.has_content?(@zgem.name)
+      assert page.has_selector?("a[href='#{rubygem_path(@zgem)}']")
     end
     should "display uppercase letter" do
-      assert_contain "starting with Z"
+      assert page.has_content?("starting with Z")
     end
   end
 
@@ -245,14 +245,14 @@ class RubygemsControllerTest < ActionController::TestCase
     should assign_to(:gems) { @gems }
     should "render links" do
       @gems.each do |g|
-        assert_contain g.name
-        assert_have_selector "a[href='#{rubygem_path(g)}']"
+        assert page.has_content?(g.name)
+        assert page.has_selector?("a[href='#{rubygem_path(g)}']")
       end
     end
     should "display uppercase A" do
-      assert_contain "starting with A"
-      assert_not_contain "asdf"
-      assert_not_contain "ASDF"
+      assert page.has_content?("starting with A")
+      assert ! page.has_content?("asdf")
+      assert ! page.has_content?("ASDF")
     end
   end
 
@@ -267,18 +267,18 @@ class RubygemsControllerTest < ActionController::TestCase
     should render_template :show
     should assign_to :rubygem
     should assign_to(:latest_version) { @latest_version }
-    should "render info about the package" do
-      assert_contain @rubygem.name
-      assert_contain @latest_version.number
-      assert_contain @latest_version.built_at.to_date.to_formatted_s(:long)
-      assert_contain "Links"
+    should "render info about the gem" do
+      assert page.has_content?(@rubygem.name)
+      assert page.has_content?(@latest_version.number)
+      assert page.has_css?("small:contains('#{@latest_version.built_at.to_date.to_formatted_s(:long)}')")
+      assert page.has_content?("Links")
     end
   end
 
   context "On GET to show with a package that has multiple versions" do
     setup do
       @rubygem = Factory(:rubygem)
-      @older_version = Factory(:version, :number => "1.0.0", :rubygem => @rubygem, :created_at => 2.minutes.ago)
+      @older_version = Factory(:version, :number => "1.0.0", :rubygem => @rubygem, :created_at => 2.days.ago)
       @latest_version = Factory(:version, :number => "2.0.0", :rubygem => @rubygem, :created_at => 1.minute.ago)
       get :show, :id => @rubygem.to_param
     end
@@ -286,14 +286,30 @@ class RubygemsControllerTest < ActionController::TestCase
     should respond_with :success
     should render_template :show
     should assign_to :rubygem
-    should "render info about the package" do
-      assert_contain @rubygem.name
-      assert_contain @latest_version.number
-      assert_contain @latest_version.built_at.to_date.to_formatted_s(:long)
+    should "render info about the gem" do
+      assert page.has_content?(@rubygem.name)
+      assert page.has_content?(@latest_version.number)
+      assert page.has_css?("small:contains('#{@latest_version.built_at.to_date.to_formatted_s(:long)}')")
 
-      assert_contain "Versions"
-      assert_contain @rubygem.versions.last.number
-      assert_contain @rubygem.versions.last.built_at.to_date.to_formatted_s(:long)
+      assert page.has_content?("Versions")
+      assert page.has_content?(@older_version.number)
+      assert page.has_css?("small:contains('#{@older_version.built_at.to_date.to_formatted_s(:long)}')")
+    end
+  end
+
+  context "On GET to show for a yanked gem with no versions" do
+    setup do
+      version = Factory(:version, :created_at => 1.minute.ago)
+      @rubygem = version.rubygem
+      @rubygem.yank!(version)
+      get :show, :id => @rubygem.to_param
+    end
+    should respond_with :success
+    should render_template :show
+    should assign_to :rubygem
+    should "render info about the gem" do
+      assert page.has_content?("This package has been yanked")
+      assert page.has_no_content?('Versions')
     end
   end
 
@@ -305,8 +321,8 @@ class RubygemsControllerTest < ActionController::TestCase
     should respond_with :success
     should render_template :show
     should assign_to :rubygem
-    should "render info about the package" do
-      assert_contain "This package is not currently hosted on GetBPM.org."
+    should "render info about the gem" do
+      assert page.has_content?("This package is not currently hosted on GetBPM.org.")
     end
   end
 
@@ -324,8 +340,8 @@ class RubygemsControllerTest < ActionController::TestCase
     should render_template :show
     should assign_to(:latest_version) { @version }
     should "show runtime dependencies and development dependencies" do
-      assert_contain @runtime.rubygem.name
-      assert_contain @development.rubygem.name
+      assert page.has_content?(@runtime.rubygem.name)
+      assert page.has_content?(@development.rubygem.name)
     end
   end
 
@@ -348,10 +364,10 @@ class RubygemsControllerTest < ActionController::TestCase
       should assign_to(:rubygem) { @rubygem }
       should respond_with :success
       should "have an subscribe link that goes to the sign in page" do
-        assert_have_selector "a[href='#{sign_in_path}']"
+        assert page.has_selector?("a[href='#{sign_in_path}']")
       end
       should "not have an unsubscribe link" do
-        assert_have_no_selector "a#unsubscribe"
+        assert ! page.has_selector?("a#unsubscribe")
       end
     end
 
