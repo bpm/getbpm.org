@@ -11,8 +11,10 @@ class HerokuAssetCacher
   def call(env)
 		@env = env
 		if ActionController::Base.perform_caching
-			return render_css if env['REQUEST_PATH'] =~ /\/stylesheets\/all.css/i
-			return render_js if env['REQUEST_PATH'] =~ /\/javascripts\/all.js/i
+      case env['PATH_INFO']
+        when /\/stylesheets\/all.css/i then return render_css
+        when /\/javascripts\/all.js/i  then return render_js
+      end
 		end
     
 		@app.call(env)
@@ -27,7 +29,7 @@ class HerokuAssetCacher
 				'Content-Length' => File.size(file).to_s,
 				'Content-Type'   => 'text/javascript'
 				},
-				File.read(file)
+				File.open(file)
 			]
   end
   
@@ -40,7 +42,7 @@ class HerokuAssetCacher
 				'Content-Length' => File.size(file).to_s,
 				'Content-Type'   => 'text/css'
 				},
-				File.read(file)
+				File.open(file)
 			]
   end
   
