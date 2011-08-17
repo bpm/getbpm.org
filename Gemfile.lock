@@ -82,6 +82,10 @@ GEM
     gherkin (2.4.6)
       json (>= 1.4.6)
     gravtastic (3.1.0)
+    heroku (2.4.0)
+      launchy (>= 0.3.2)
+      rest-client (~> 1.6.1)
+      term-ansicolor (~> 1.0.5)
     high_voltage (1.0.0)
     hoptoad_notifier (2.4.11)
       activesupport
@@ -97,6 +101,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.16)
+    mocha (0.9.12)
     multi_json (1.0.3)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
@@ -185,11 +190,13 @@ DEPENDENCIES
   fog
   gchartrb
   gravtastic
+  heroku
   high_voltage
   hoptoad_notifier
   jruby-openssl
   launchy
   mail
+  mocha
   newrelic_rpm
   nokogiri
   paul_revere

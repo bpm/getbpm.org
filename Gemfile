@@ -63,3 +63,8 @@ group :test do
   gem 'timecop'
   gem 'webmock'
 end
+
+group :development do
+  gem 'heroku'
+  gem 'mocha' # For testing heroku_asset_cacher
+end
