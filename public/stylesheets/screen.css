@@ -2,7 +2,7 @@ body {
   line-height: 1;
   font-size: .625em;
   background: #2E562A url("/images/background.png");
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; /* This should give most users (Windows users don't have Helvetica Neue) the best experience. */
 }
 
 ol, ul {
@@ -84,12 +84,12 @@ table {
 .header h1 {
   display: inline-block;
   vertical-align: middle;
-  padding-top: 3em;
+  padding-top: 2em;
 }
 
 .header h1 a {
   display: block;
-  width: 280px;
+  width: 325px;
   height: 98px;
   text-indent: -9999px;
   text-decoration: none;
@@ -910,34 +910,34 @@ table {
 
 .footer .links {
   height: 30px;
-  margin-top: 15px;
+  text-align: center;
 }
 
 .footer .links a {
   border: none;
-  text-align: center;
-  font-weight: normal;
+  font-weight: bold;
   color: #FFD283;
-  font-size: 1.5em;
-  margin-right: 10px;
-  margin-top: -15px;
+  text-shadow: rgba(0,0,0, .50) 0px 1px 1px;
+  font-size: 1.3em;
+  margin: 30px 15px 0px 15px;
 }
 
 .footer .links .sponsor {
-  float: right;
+  display: inline-block;
   font-size: 1em;
-  margin-top: -25px;
+  font-weight: normal;
+  margin-top: 15px;
   margin-bottom: 20px;
-  margin-left: 10px;
-}
-
-.footer .links #dnsimple img {
-  margin-top: 13px;
+  margin-left: 15px;
+  text-shadow: rgba(0,0,0, .25) 0px -1px 1px;
+  color: rgba(255,255,255,.65);
 }
 
 .footer .links .sponsor img {
-  padding-top: 5px;
-  display: block;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 5px;
+  margin-bottom: 7px;
 }
 
 .footer a:hover {
