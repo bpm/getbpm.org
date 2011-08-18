@@ -29,7 +29,7 @@ staging:
   asset_cacher: false
 
 live: &LIVE
-  host: sproutcutter.heroku.com
+  host: getbpm.org
   local_storage: false
   redirector: false
   s3_bucket: codename-sproutcutter
