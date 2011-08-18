@@ -90,18 +90,10 @@
           <%= link_to t('.footer.source_code'), "http://github.com/bpm/getbpm.org" %>
           <%= link_to t('.footer.discussion_forum'), "http://groups.google.com/group/getBPM" %>
           <%= link_to t('.footer.statistics'), stats_url %>
-          <%= link_to t('.footer.designed_by', :designer => image_tag('thoughtbot.png')).html_safe, "http://thoughtbot.com",
+          <%= link_to t('.footer.supported_by', :supporter => image_tag('strobe.png')).html_safe, "http://www.strobecorp.com",
+            :title => t('.footer.supported_by_title', :supporter => 'Strobe'),
             :class => "sponsor",
-            :title => t('.footer.designed_by_title', :designer => 'Thoughtbot'),
-            :id    => "thoughtbot" %>
-          <%= link_to t('.footer.resolved_with', :resolver => image_tag('dnsimple.png')).html_safe, "http://dnsimple.com",
-            :title => t('.footer.resolved_with_title', :resolver => 'DNSimple'),
-            :class => "sponsor",
-            :id    => "dnsimple" %>
-          <%= link_to t('.footer.supported_by', :supporter => image_tag('rubycentral.png')).html_safe, "http://rubycentral.org",
-            :title => t('.footer.supported_by_title', :supporter => 'Ruby Central'),
-            :class => "sponsor",
-            :id    => "rubycentral" %>
+            :id    => "strobe" %>
         </div>
       </div>
     </div>
