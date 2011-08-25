@@ -668,24 +668,24 @@ table {
   border-bottom: 1px solid #B4AC99;
 }
 
-.main .info .meta .bundler {
+.main .info .meta .project_json {
   padding-top: 2em;
   padding-bottom: 2em;
   border-bottom: 1px solid #B4AC99;
 }
 
-.main .info .meta .bundler pre {
+.main .info .meta .project_json pre {
   display: block;
   margin: 0;
 }
 
-.main .info .meta .bundler #github_clippy {
+.main .info .meta .project_json #github_clippy {
   margin-left: 3px;
   display: inline-block;
   height: 10px;
 }
 
-.main .info .meta .bundler h5 {
+.main .info .meta .project_json h5 {
   margin-bottom: 0.7em;
   display: inline-block;
 }

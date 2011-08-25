@@ -71,10 +71,10 @@
           </div>
         <% end %>
 
-        <div class="bundler">
-          <h5><%= t '.bundler_header' %></h5>
-          <%= render :partial => "rubygems/clippy", :locals => { :embed => "github_clippy", :text => @latest_version.to_bundler } %>
-          <pre><code><%= @latest_version.to_bundler %></code></pre>
+        <div class="project_json">
+          <h5><%= t '.project_json_header' %></h5>
+          <%= render :partial => "rubygems/clippy", :locals => { :embed => "github_clippy", :text => @latest_version.to_dep_string } %>
+          <pre><code><%= @latest_version.to_dep_string %></code></pre>
         </div>
       <% end %>
 

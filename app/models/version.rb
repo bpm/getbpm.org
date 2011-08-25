@@ -198,8 +198,8 @@ class Version < ActiveRecord::Base
     end
   end
 
-  def to_bundler
-    %{gem "#{rubygem.name}", "~> #{number}"}
+  def to_dep_string
+    %{"#{rubygem.name}": "~> #{number}"}
   end
 
   def to_gem_version
@@ -211,7 +211,7 @@ class Version < ActiveRecord::Base
   end
 
   def to_install
-    command = "gem install #{rubygem.name}"
+    command = "bpm add #{rubygem.name}"
     latest = prerelease ? rubygem.versions.by_position.prerelease.first : rubygem.versions.most_recent
     command << " -v #{number}" if latest != self
     command << " --pre" if prerelease

@@ -176,8 +176,8 @@ class VersionTest < ActiveSupport::TestCase
     should "give no version flag for the latest version" do
       new_version = Factory(:version, :rubygem => @version.rubygem, :built_at => 1.day.from_now)
 
-      assert_equal "gem install #{@version.rubygem.name} -v #{@version.number}", @version.to_install
-      assert_equal "gem install #{new_version.rubygem.name}", new_version.to_install
+      assert_equal "bpm add #{@version.rubygem.name} -v #{@version.number}", @version.to_install
+      assert_equal "bpm add #{new_version.rubygem.name}", new_version.to_install
     end
 
     should "tack on prerelease flag" do
@@ -191,9 +191,9 @@ class VersionTest < ActiveSupport::TestCase
 
       @version.rubygem.reorder_versions
 
-      assert_equal "gem install #{@version.rubygem.name} -v #{@version.number} --pre",
+      assert_equal "bpm add #{@version.rubygem.name} -v #{@version.number} --pre",
         @version.to_install
-      assert_equal "gem install #{new_version.rubygem.name} --pre",
+      assert_equal "bpm add #{new_version.rubygem.name} --pre",
         new_version.to_install
     end
 
@@ -208,16 +208,16 @@ class VersionTest < ActiveSupport::TestCase
 
       @version.rubygem.reorder_versions
 
-      assert_equal "gem install #{@version.rubygem.name} --pre", @version.to_install
-      assert_equal "gem install #{old_version.rubygem.name}", old_version.to_install
+      assert_equal "bpm add #{@version.rubygem.name} --pre", @version.to_install
+      assert_equal "bpm add #{old_version.rubygem.name}", old_version.to_install
     end
 
     should "give title for #to_title" do
       assert_equal "#{@version.rubygem.name} (#{@version.to_s})", @version.to_title
     end
 
-    should "give version with twiddle-wakka for #to_bundler" do
-      assert_equal %{gem "#{@version.rubygem.name}", "~> #{@version.to_s}"}, @version.to_bundler
+    should "give version with twiddle-wakka for #to_dep_string" do
+      assert_equal %{"#{@version.rubygem.name}": "~> #{@version.to_s}"}, @version.to_dep_string
     end
 
     should "give title and platform for #to_title" do
