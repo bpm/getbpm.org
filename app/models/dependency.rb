@@ -89,7 +89,8 @@ class Dependency < ActiveRecord::Base
   end
 
   def parse_gem_dependency
-    self.requirements = gem_dependency.requirements_list.join(', ')
+    # Hack for Syck bug if we're not using Psych
+    self.requirements = gem_dependency.requirements_list.join(', ').gsub(/#<(YAML::)?Syck::DefaultKey:[^>]+>/, '=')
     self.scope = gem_dependency.type.to_s
   end
 
