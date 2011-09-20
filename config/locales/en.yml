@@ -32,8 +32,8 @@ en:
       find_blurb: "Find your packages easier, publish them faster, and have fun doing it."
       learn:
         header: 'learn'
-        install_rubygems: "Install BPM %{version}"
-        rubygems_subtitle: "Ruby's premier packaging system"
+        install_bpm: "Install BPM %{version}"
+        bpm_subtitle: "The browser's JavaScript package manager"
         browse_docs: "Browse the Docs"
         docs_subtitle: "The comprehensive guide on BPM"
         gem_specification: "BPM Package Specification"
@@ -72,11 +72,7 @@ en:
         source_code: "Code"
         discussion_forum: "Discuss"
         statistics: "Stats"
-        designed_by: "designed by %{designer}"
-        designed_by_title: "Designed by %{designer}"
-        resolved_with: "resolved with %{resolver}"
-        resolved_with_title: "Resolved with %{resolver}"
-        supported_by: "hosted by %{supporter}"
+        supported_by: "sponsored by %{supporter}"
         supported_by_title: "Hosted by %{supporter}"
 
   pages:

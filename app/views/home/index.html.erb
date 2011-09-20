@@ -14,11 +14,11 @@
     <div class="learn">
       <h3><%= t '.learn.header' %></h3>
       <dl>
-        <dt><%= link_to t('.learn.install_rubygems', :version => RUBYGEMS_VERSION), page_url("download") %></dt>
-        <dd><%= t '.learn.rubygems_subtitle' %></dd>
-        <dt><%= link_to t('.learn.browse_docs'), "http://docs.getbpm.org" %></dt>
+        <dt><%= link_to t('.learn.install_bpm', :version => BPM_VERSION), page_url("download") %></dt>
+        <dd><%= t '.learn.bpm_subtitle' %></dd>
+        <dt><%= link_to t('.learn.browse_docs'), "https://github.com/bpm/bpm/wiki" %></dt>
         <dd><%= t '.learn.docs_subtitle' %></dd>
-        <dt><%= link_to t('.learn.gem_specification'), "http://docs.getbpm.org/read/chapter/20" %></dt>
+        <dt><%= link_to t('.learn.gem_specification'), "https://github.com/bpm/bpm/wiki/Package-JSON-Reference" %></dt>
         <dd><%= t '.learn.spec_subtitle' %></dd>
       </dl>
     </div>
