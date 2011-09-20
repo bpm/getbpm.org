@@ -21,7 +21,6 @@ module Gemcutter
     config.encoding  = "utf-8"
 
     config.middleware.use "Hostess"
-    config.middleware.insert_after "Hostess", "Redirector" if $rubygems_config[:redirector]
 
     unless Rails.env.maintenance?
       config.action_mailer.default_url_options  = { :host => HOST }

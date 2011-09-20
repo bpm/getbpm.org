@@ -1,7 +1,6 @@
 development:
   host: localhost
   local_storage: true
-  redirector: false
   delivery_method: :sendmail
   s3_bucket: development.s3.rubygems.org
   s3_domain: development.s3.rubygems.org
@@ -11,7 +10,6 @@ development:
 test:
   host: www.example.com
   local_storage: true
-  redirector: false
   delivery_method: :test
   s3_bucket: test.s3.rubygems.org
   s3_domain: test.s3.rubygems.org
@@ -21,7 +19,6 @@ test:
 staging:
   host: staging.rubygems.org
   local_storage: false
-  redirector: true
   delivery_method: :sendmail
   s3_bucket: staging.s3.rubygems.org
   s3_domain: staging.s3.rubygems.org
@@ -31,7 +28,6 @@ staging:
 live: &LIVE
   host: getbpm.org
   local_storage: false
-  redirector: false
   s3_bucket: codename-sproutcutter
   s3_domain: s3.amazonaws.com/codename-sproutcutter
   cf_domain: s3.amazonaws.com/codename-sproutcutter

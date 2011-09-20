@@ -20,9 +20,8 @@ en:
       no_subscriptions: "You're not subscribed to any packages yet. Visit a %{gem_link} to subscribe to one!"
       gem_link_text: "package page"
       mine: "My Packages"
-      no_owned: "You haven't pushed any packages yet. Perhaps check out the guides on %{creating_link} a package or %{migrating_link} a package from RubyForge."
+      no_owned: "You haven't pushed any packages yet. Perhaps check out the guides on %{creating_link} a package."
       creating_link_text: 'creating'
-      migrating_link_text: 'migrating'
       my_subscriptions: 'My Subscriptions'
 
   home:
