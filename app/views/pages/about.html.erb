@@ -7,15 +7,12 @@
   <li><%= t '.purpose.enable_community' %></li>
 </ol>
 <p>
-  <%= t('.founding', :founder => link_to('Nick Quaranto', 'http://twitter.com/qrush'),
-                     :contributors => link_to("55 Rubyists", "http://twitter.com/gemcutter/contributors"),
-                     :downloads => link_to("millions of gem downloads", stats_url),
+  <%= t('.founding', :founder => link_to('Charles Jolley', 'http://twitter.com/okito'),
+                     :developer => link_to('Peter Wagenet', 'http://twitter.com/wagenet'),
                      :title => t('title')).html_safe %>
 </p>
 <p>
-  <%= t('.support', :thoughtbot => link_to("Thoughtbot", "http://thoughtbot.com"),
-                    :github => link_to("GitHub", "http://github.com"),
-                    :heroku => link_to("Heroku", "http://heroku.com")).html_safe %>
+  <%= t('.support', :strobe => link_to("Strobe", "http://strobecorp.com")).html_safe %>
 </p>
 <p>
   <%= t('.technical', :rails => link_to("Rails", "http://rubyonrails.org"),

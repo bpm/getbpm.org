@@ -79,12 +79,12 @@ en:
       title: About
       subtitle: what this is
       purpose:
-        header: "Welcome to %{site}, the BPM community's packages hosting service. The purpose of this project is three-fold:"
+        header: "Welcome to %{site}, the BPM community's package hosting service. The purpose of this project is three-fold:"
         better_api: Provide a better API for dealing with packages
         transparent_pages: Create more transparent and accessible project pages
         enable_community: Enable the community to improve and enhance the site
-      founding: "The project was started in April 2009 by %{founder}, and has since grown to include the contributions of over %{contributors} and %{downloads}."
-      support: "BPM is currently maintained by %{strobe}. %{github} has also been invaluable for helping us collaborate and share code easily."
+      founding: "The project was started in August 2011 by %{founder}, and is now developed by %{developer}."
+      support: "BPM is currently maintained by %{strobe}."
       technical: "Some insights into the technical aspects of the site: It's 100% Ruby. The main site is a %{rails} application, and the package serving is done through %{sinatra}. Packages are hosted on %{s3}, and the time between publishing a new package and having it ready for installation is minimal. For more info, %{source_code}, which is %{license} over at GitHub."
     create:
       title: create
