@@ -26,7 +26,7 @@ en:
 
   home:
     index:
-      gems_header: "of %{gem_count} packages built since July 2009"
+      gems_header: "of %{gem_count} packages built since August 2011"
       welcome_blurb: "Welcome to your community BPM Package host."
       find_blurb: "Find your packages easier, publish them faster, and have fun doing it."
       learn:
