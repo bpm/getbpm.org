@@ -2,7 +2,6 @@ en:
   title: "GetBPM.org"
   subtitle: "your community BPM package host"
   url: "http://getbpm.org"
-  help_url: "http://help.getbpm.org"
   please_sign_up: "Access Denied. Please sign up for an account at http://getbpm.org"
   please_confirm: "Access Denied. Please confirm your GetBPM.org account."
   feed_subscribed: "GetBPM.org | Subscribed Packages"
