@@ -24,7 +24,6 @@
       <div class="admin">
         <%= link_to t('edit'), edit_rubygem_path(@rubygem), :id => "edit" if @rubygem.owned_by?(current_user) %>
         <%= download_link(@latest_version) %>
-        <%= documentation_link(@latest_version, @rubygem.linkset) %>
         <% if @latest_version.indexed %>
           <%= subscribe_link(@rubygem) %>
           <%= unsubscribe_link(@rubygem) %>
